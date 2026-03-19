@@ -34,7 +34,7 @@ export function useProblems({selectedServerId, severityFilter, refetchInterval =
 
     queryFn: async (): Promise<ProblemWithServer[]> => {
       const results = await Promise.allSettled(serversToFetch.map(async ({ server, token }) => {
-          
+
         const problems = await fetchProblemsWithHosts({ serverUrl: server.url, token, severities: severityFilter, acknowledged: false, suppressed: showSuppressed});
           return problems.map(p => ({
             ...p,

@@ -16,6 +16,7 @@ export interface ProblemWithServer extends ZabbixProblem {
   serverId: string;
   serverName: string;
   hostName: string;
+  trigger: ZabbixTrigger
 }
 
 export interface SuppressProblemsOptions {
@@ -28,7 +29,8 @@ export interface SuppressProblemsOptions {
 
 export async function fetchProblems(options: FetchProblemsOptions,): Promise<ZabbixProblem[]> {
 
-  const { serverUrl, token, severities, limit = 100, id, acknowledged, suppressed } = options;
+  let { serverUrl, token, severities, limit = 100, id, acknowledged, suppressed } = options;
+
   const params: Record<string, unknown> = {
     output: [
       'eventid',
@@ -44,7 +46,7 @@ export async function fetchProblems(options: FetchProblemsOptions,): Promise<Zab
     sortfield: ['eventid'],
     sortorder: 'DESC',
     limit,
-    recent: true,
+    suppressed: false
   };
 
 
@@ -61,27 +63,20 @@ export async function fetchProblems(options: FetchProblemsOptions,): Promise<Zab
     params.severities = severities
   }
 
-  if(suppressed){ 
-    params.suppressed = true
+  if (suppressed || suppressed == undefined) {
+    params.suppressed = suppressed
   }
-
 
   return zabbixRequest<ZabbixProblem[]>(serverUrl, 'problem.get', params, token);
 }
 
-export async function fetchTriggersForProblems(
-  serverUrl: string,
-  token: string,
-  triggerIds: string[],
-): Promise<ZabbixTrigger[]> {
+export async function fetchTriggersForProblems(serverUrl: string, token: string, triggerIds: string[], ): Promise<ZabbixTrigger[]> {
+
   if (triggerIds.length === 0) return [];
 
-  return zabbixRequest<ZabbixTrigger[]>(
-    serverUrl,
-    'trigger.get',
-    {
+  return zabbixRequest<ZabbixTrigger[]>(serverUrl, 'trigger.get', {
       triggerids: triggerIds,
-      output: ['triggerid', 'description'],
+      // output: ['triggerid', 'description'],
       filter: {
         'value': '1'
       },
@@ -94,17 +89,16 @@ export async function fetchTriggersForProblems(
 export async function fetchProblemsWithHosts(options: FetchProblemsOptions,): Promise<ProblemWithServer[]> {
   const { serverUrl, token } = options;
   const problems = await fetchProblems(options);
-  if (problems.length === 0) return [];
 
+  if (problems.length === 0) return [];
 
   const triggerIds = [...new Set(problems.map(p => p.objectid))];
   let triggers = await fetchTriggersForProblems(serverUrl, token, triggerIds);
 
-  // triggers = triggers.filter((f) => f.value === '0')
-
   const triggerMap = new Map<string, ZabbixTrigger>(
     triggers.map(t => [t.triggerid, t]),
   );
+
 
   return problems.map(p => {
     const trigger = triggerMap.get(p.objectid);
@@ -114,6 +108,7 @@ export async function fetchProblemsWithHosts(options: FetchProblemsOptions,): Pr
       serverId: '',
       serverName: '',
       hostName,
+      trigger: trigger!
     };
   });
 }
@@ -153,6 +148,19 @@ export async function unsuppressProblems(eventids: number[], serverUrl: string, 
   let params: Record<string, unknown> = {
     eventids: eventids,
     action: 68,
+    message: message,
+  }
+  await zabbixRequest(serverUrl,'event.acknowledge',params, token,);
+
+}
+
+export async function closeProblem(eventids: number[], serverUrl: string, token: string, message:string): Promise<void> {
+
+  if (!message) message = ' '
+
+  let params: Record<string, unknown> = {
+    eventids: eventids,
+    action: 5,
     message: message,
   }
   await zabbixRequest(serverUrl,'event.acknowledge',params, token,);

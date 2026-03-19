@@ -13,6 +13,7 @@ import { ServerSelector } from '../../src/components/ServerSelector';
 import { SeverityCounter } from '../../src/components/ui/SeverityCounter';
 import type { ZabbixSeverity } from '../../src/api/zabbix.types';
 import { Checkbox } from 'expo-checkbox';
+import { useFocusEffect } from 'expo-router';
 
 const SEVERITY_FILTERS: ZabbixSeverity[] = [5, 4, 3, 2, 1];
 
@@ -26,6 +27,12 @@ export default function DashboardScreen() {
   const severityFilter = activeSeverity !== null ? [activeSeverity] : undefined;
   const { problems, isLoading, isRefetching, refetch, countBySeverity, totalCount } = useProblems({ selectedServerId, severityFilter, showSuppressed });
   const activeServer = servers.find(s => s.id === session?.serverId);
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+  }, []),
+);
 
   const handleSeverityPress = useCallback((sev: ZabbixSeverity) => {
     setActiveSeverity(prev => (prev === sev ? null : sev));

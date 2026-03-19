@@ -69,6 +69,7 @@ export interface ZabbixTrigger {
   status: string;
   value: string;
   lastchange: string;
+  manual_close: string
   hosts: Array<{ hostid: string; name: string }>;
 }
 
