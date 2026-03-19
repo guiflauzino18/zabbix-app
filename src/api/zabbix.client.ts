@@ -20,12 +20,8 @@ export function getZabbixClient(serverUrl: string): AxiosInstance {
 
 let requestId = 1;
 
-export async function zabbixRequest<T = unknown>(
-  serverUrl: string,
-  method: string,
-  params: Record<string, unknown> = {},
-  token?: string,
-): Promise<T> {
+export async function zabbixRequest<T = unknown>(serverUrl: string,method: string,params: Record<string, unknown> = {},token?: string,): Promise<T> {
+  
   const client = getZabbixClient(serverUrl);
 
   const body: ZabbixApiRequest = {

@@ -8,14 +8,12 @@ export interface LoginCredentials {
 }
 
 export interface LoginResult {
-  token: string;
+  token: string; //sessionId
   user: ZabbixUser;
   apiVersion: string;
 }
 
-export async function loginToZabbix(
-  credentials: LoginCredentials,
-): Promise<LoginResult> {
+export async function loginToZabbix(credentials: LoginCredentials,): Promise<LoginResult> {
   const { serverUrl, username, password } = credentials;
 
   // 1. Busca a versão da API (sem autenticação)
@@ -25,7 +23,7 @@ export async function loginToZabbix(
     {},
   );
 
-  
+
   // 2. Realiza o login — Zabbix 6.4+ usa "username", versões antigas usam "user"
   const majorVersion = parseInt(apiVersion.split('.')[0], 10);
   const minorVersion = parseInt(apiVersion.split('.')[1], 10);
@@ -37,28 +35,27 @@ export async function loginToZabbix(
 
   console.log(loginParams)
   
-  const token = await zabbixRequest<string>(
+  const user = await zabbixRequest<ZabbixUser>(
     serverUrl,
     'user.login',
-    { ...loginParams, userData: false }
+    { ...loginParams, userData: true }
   );
   
-  console.log(token)
 
-  // 3. Busca dados do usuário autenticado
-  const users = await zabbixRequest<ZabbixUser[]>(
-    serverUrl,
-    'user.get',
-    {
-      output: ['userid', 'username', 'name', 'surname', 'type'],
-      limit: 1,
-    },
-    token,
-  );
+  // // 3. Busca dados do usuário autenticado
+  // const users = await zabbixRequest<ZabbixUser[]>(
+  //   serverUrl,
+  //   'user.get',
+  //   {
+  //     output: ['userid', 'username', 'name', 'surname', 'type'],
+
+  //   },
+  //   user.sessionid
+  // );
 
   return {
-    token,
-    user: users[0],
+    token: user.sessionid,
+    user: user,
     apiVersion,
   };
 }

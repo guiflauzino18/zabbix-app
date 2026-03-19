@@ -31,6 +31,9 @@ export default function DashboardScreen() {
     setActiveSeverity(prev => (prev === sev ? null : sev));
   }, [])
 
+
+  // console.log("dashboard.tsx:35 "+currentUser?.username)
+
   const renderHeader = () => (
     <View className='m-2 bg-bg_primary rounded-sm'>
       {/* Header */}
@@ -112,7 +115,7 @@ export default function DashboardScreen() {
         </Text>
         
         <View className='flex-row gap-1'>
-          <Checkbox value={showSuppressed} onValueChange={(check) =>setShowSuppressed(check)}/>
+          <Checkbox className='h-1' value={showSuppressed} onValueChange={(check) =>setShowSuppressed(check)}/>
           <Text className='text-sm text-text_primary'>Exibir suprimidos</Text>
         </View>
       </View>

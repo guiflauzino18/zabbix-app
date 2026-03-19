@@ -34,11 +34,7 @@ export function useAuth() {
     setLoginError(null);
 
     try {
-      const result = await loginToZabbix({
-        serverUrl: server.url,
-        username,
-        password,
-      });
+      const result = await loginToZabbix({serverUrl: server.url,username,password,});
 
       updateServer(server.id, { apiVersion: result.apiVersion });
 
