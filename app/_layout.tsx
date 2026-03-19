@@ -28,7 +28,7 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <View className='flex-1 dark'>
+      <View className='flex-1 root'>
         <Stack screenOptions={{ headerShown: false }} />
       </View>
     </QueryClientProvider>
