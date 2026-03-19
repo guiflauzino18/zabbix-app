@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:root {
+    --color-red: #D40000;
+    --color-white: #fff;
+    --color-success: #34AF67;
+    --color-bg-primary: #FFFFFF;
+    --color-bg-secondary: #EBEEF0;
+    --color-bg-tertiary: #0A466A;
+    --color-bg-dark: #092637;
+    --color-text-primary: #858C90;
+    --color-text-secondary: #318FC6;
+    --color-text-tertiary: #6C6C6C;
+    --color-border: #858C90;
+    --severity-color-info-bg: #7499FF;
+    --severity-color-warning-bg: #FFC859;
+    --severity-color-average-bg: #FFA059;
+    --severity-color-high-bg: #E97659;
+    --severity-color-disaster-bg: #E45959;
+
+}
+
+.dark {
+    --color-red: #D40000;
+    --color-white: #fff;
+    --color-success: #34AF67;
+    --color-bg-primary: #2B2B2B;
+    --color-bg-secondary: #0E1012;
+    --color-bg-tertiary: #454545;
+    --color-bg-dark: #0E0E0E;
+    --color-text-primary: #DEDEDE;
+    --color-text-secondary: #318FC6;
+    --color-text-tertiary: #6C6C6C;
+    --color-border: #6C6C6C;
+
+    --severity-color-info-bg: #7499FF;
+    --severity-color-warning-bg: #FFC859;
+    --severity-color-average-bg: #FFA059;
+    --severity-color-high-bg: #E97659;
+    --severity-color-disaster-bg: #E45959;
+
+}
