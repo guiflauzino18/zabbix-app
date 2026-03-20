@@ -13,7 +13,7 @@ import { ServerSelector } from '../../src/components/ServerSelector';
 import { SeverityCounter } from '../../src/components/ui/SeverityCounter';
 import type { ZabbixSeverity } from '../../src/api/zabbix.types';
 import { Checkbox } from 'expo-checkbox';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 const SEVERITY_FILTERS: ZabbixSeverity[] = [5, 4, 3, 2, 1];
 
@@ -53,6 +53,7 @@ export default function DashboardScreen() {
               <Text className="text-green-400 text-xs">
                 {activeSessions.length} servidor{activeSessions.length !== 1 ? 'es' : ''} ativo{activeSessions.length !== 1 ? 's' : ''}
               </Text>
+              <Text onPress={() => router.push('/(auth)/login')} className='text-text_secondary text-xs ml-2'>+ Adicionar</Text>
             </View>
           </View>
 

@@ -106,7 +106,7 @@ export default function LoginScreen() {
                   ) : (
                     <>
                       <Text className="text-text_primary text-center text-sm">
-                        Todos os servidores já estão autenticados
+                        Todos os servidores já estão autenticados. Para adicionar servidores ao dashboard, adicione um novo servidor na tela de login ou em Gerenciar Servidores na aba Perfil.
                       </Text>
                       <TouchableOpacity
                         onPress={() => router.replace('/(app)/dashboard')}
