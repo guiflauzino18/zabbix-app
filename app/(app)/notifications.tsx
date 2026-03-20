@@ -52,14 +52,13 @@ export default function NotificationsScreen() {
   const unread = unreadCount();
 
   // Marca todas como lidas ao entrar na tela
-  useFocusEffect(
-    useCallback(() => {
-      if (unread > 0) markAllAsRead();
-    }, [unread]),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (unread > 0) markAllAsRead();
+  //   }, [unread]),
+  // );
 
-  const sections = useMemo(
-    () => groupByDay(notifications),
+  const sections = useMemo(() => groupByDay(notifications),
     [notifications],
   );
 

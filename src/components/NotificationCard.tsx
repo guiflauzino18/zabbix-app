@@ -66,7 +66,7 @@ export function NotificationCard({ notification: n }: Props) {
           </View>
 
           {/* Badges e meta */}
-          <View className="flex-row items-center gap-2 mt-1.5 flex-wrap">
+          <View className="flex-row justify-between items-center gap-2 mt-1.5 flex-wrap">
             {/* Badge de severidade ou resolvido */}
             {n.isResolved ? (
               <View className="px-1.5 py-0.5 rounded-full border border-border_color" /*style={{ backgroundColor: '#0d2e1a' }}*/>
@@ -83,7 +83,7 @@ export function NotificationCard({ notification: n }: Props) {
               </View>
             )}
 
-            <Text className="text-text_primary text-xs" numberOfLines={1}>
+            <Text className="text-text_primary text-xs flex-1" numberOfLines={1}>
               {n.hostName}
             </Text>
 
