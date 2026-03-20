@@ -32,8 +32,6 @@ export async function loginToZabbix(credentials: LoginCredentials,): Promise<Log
   const loginParams = usesUsernameField
   ? { username, password }
   : { user: username, password };
-
-  console.log(loginParams)
   
   const user = await zabbixRequest<ZabbixUser>(
     serverUrl,

@@ -79,10 +79,20 @@ export default function ProfileScreen() {
           SERVIDORES
         </Text>
 
+        {/* Gerenciar Servidores */}
         <TouchableOpacity
           onPress={() => router.push('/servers')}
           className="flex-row items-center rounded-xl p-4 border border-white bg-bg_tertiary">
           <Text className="flex-1 text-white text-sm">Gerenciar servidores</Text>
+          <Text className="text-text_primary text-sm">›</Text>
+        </TouchableOpacity>
+
+
+        {/* Adicionar Sessão ao Dashboard */}
+        <TouchableOpacity
+          onPress={() => router.push('/(auth)/login')}
+          className="flex-row items-center rounded-xl p-4 border border-white bg-bg_tertiary">
+          <Text className="flex-1 text-white text-sm">Adicionar servidores a esta sessão</Text>
           <Text className="text-text_primary text-sm">›</Text>
         </TouchableOpacity>
 
