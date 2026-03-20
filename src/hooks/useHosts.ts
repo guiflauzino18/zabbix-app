@@ -11,16 +11,12 @@ export interface UseHostsOptions {
   search?: string;
 }
 
-export function useHosts({
-  selectedServerId,
-  groupId,
-  search,
-}: UseHostsOptions) {
+export function useHosts({ selectedServerId, groupId, search, }: UseHostsOptions) {
+
   const activeSessions = useActiveSessions();
 
   // Filtra quais servidores buscar baseado na seleção
-  const serversToFetch =
-    selectedServerId === 'all'
+  const serversToFetch = selectedServerId === 'all'
       ? activeSessions
       : activeSessions.filter(s => s.server.id === selectedServerId);
 
@@ -40,11 +36,7 @@ export function useHosts({
   );
 
   const { data, isLoading, isRefetching, error, refetch } = useQuery({
-    queryKey: [
-      'hosts',
-      selectedServerId,
-      activeSessions.map(s => s.server.id).join(','),
-    ],
+    queryKey: [ 'hosts', selectedServerId, activeSessions.map(s => s.server.id).join(',')],
     queryFn: async (): Promise<HostWithServer[]> => {
       // Busca hosts de todos os servidores selecionados em paralelo
       const results = await Promise.allSettled(

@@ -21,7 +21,7 @@ export default function AppLayout() {
   }
 
   function TabIcon(icon: tabicon){
-    const color = icon.active ? "#318FC6" : '#858C90'
+    const color = icon.active ? "#0A466A" : '#858C90'
     return (
       <FontAwesome name={icon.name} size={icon.size} color={color}/>
     )
@@ -35,7 +35,7 @@ export default function AppLayout() {
           backgroundColor: '#EBEEF0',
           borderTopWidth: 0.5
         },
-        tabBarActiveTintColor: "#318FC6",
+        tabBarActiveTintColor: "#0A466A",
         tabBarInactiveTintColor: '#858C90'
       }}>
 

@@ -1,6 +1,6 @@
+import { useItemHistory } from '@/hooks/useHostsDetail';
 import { View, Text, ActivityIndicator } from 'react-native';
 import Svg, { Polyline, Path, Line, Text as SvgText } from 'react-native-svg';
-import { useItemHistory } from '../hooks/useHostDetail';
 
 interface Props {
   serverUrl: string;
@@ -12,15 +12,8 @@ interface Props {
   hours?: number;
 }
 
-export function MiniChart({
-  serverUrl,
-  token,
-  itemid,
-  valueType,
-  itemName,
-  units,
-  hours = 3,
-}: Props) {
+export function MiniChart({serverUrl,token,itemid,valueType,itemName,units,hours = 3,}: Props) {
+
   const { data: history, isLoading } = useItemHistory(
     serverUrl,
     token,
@@ -32,8 +25,8 @@ export function MiniChart({
   if (isLoading) {
     return (
       <View
-        className="rounded-xl p-3 border border-zabbix-card items-center justify-center"
-        style={{ backgroundColor: '#16213E', height: 100 }}
+        className="rounded-xl p-3 border border-white items-center justify-center"
+        style={{ backgroundColor: '#0A466A', height: 100 }}
       >
         <ActivityIndicator color="#E94560" size="small" />
       </View>
@@ -43,10 +36,10 @@ export function MiniChart({
   if (!history || history.length < 2) {
     return (
       <View
-        className="rounded-xl p-3 border border-zabbix-card items-center justify-center"
+        className="rounded-xl p-3 border border-white items-center justify-center"
         style={{ backgroundColor: '#16213E', height: 100 }}
       >
-        <Text className="text-gray-600 text-xs">Sem dados históricos</Text>
+        <Text className="text-text_primary text-xs">Sem dados históricos</Text>
       </View>
     );
   }
@@ -82,15 +75,13 @@ export function MiniChart({
 
   return (
     <View
-      className="rounded-xl p-3 border border-zabbix-card"
-      style={{ backgroundColor: '#16213E' }}
-    >
+      className="rounded-xl p-3 border border-white bg-bg_tertiary">
       {/* Cabeçalho do gráfico com nome e valor atual */}
       <View className="flex-row justify-between items-center mb-2">
-        <Text className="text-gray-400 text-xs flex-1" numberOfLines={1}>
+        <Text className="text-white text-xs flex-1" numberOfLines={1}>
           {itemName} · últimas {hours}h
         </Text>
-        <Text className="text-blue-400 text-xs font-medium ml-2">
+        <Text className="text-text_secondary text-xs font-medium ml-2">
           {displayValue}{units}
         </Text>
       </View>

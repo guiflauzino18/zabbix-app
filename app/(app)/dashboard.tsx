@@ -39,8 +39,6 @@ export default function DashboardScreen() {
   }, [])
 
 
-  // console.log("dashboard.tsx:35 "+currentUser?.username)
-
   const renderHeader = () => (
     <View className='m-2 bg-bg_primary rounded-sm'>
       {/* Header */}
@@ -64,11 +62,7 @@ export default function DashboardScreen() {
                 borderColor: totalCount > 0 ? '#8c1515' : '#0e6833',
               }}
             >
-              <Text
-                className="text-xl font-semibold text-white"
-              >
-                {totalCount}
-              </Text>
+              <Text className="text-xl font-semibold text-white">{totalCount}</Text>
               <Text className="text-white text-xs">incidentes</Text>
             </View>
 

@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import {
-  View, Text, FlatList, TextInput,
-  RefreshControl, ActivityIndicator, SectionList,
-} from 'react-native';
+import { View, Text, FlatList, TextInput, RefreshControl, ActivityIndicator, SectionList, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHosts } from '../../src/hooks/useHosts';
 import { HostCard } from '../../src/components/HostCard';
@@ -12,7 +9,7 @@ import { useHostGroups } from '@/hooks/useHostGroups';
 export default function HostsScreen() {
   const [selectedServerId, setSelectedServerId] = useState<'all' | string>('all');
   const [selectedGroupId, setSelectedGroupId] = useState<string>('all');
-  const [search, setSearch] = useState('');
+  let [search, setSearch] = useState('');
 
   const {
     hostsWithProblems,
@@ -46,21 +43,23 @@ export default function HostsScreen() {
         </View>
 
         {/* Campo de busca */}
-        <View className="flex-row items-center gap-2 rounded-xl px-3 mt-3 border border-border_color bg-bg_secondary">
+        <View className="flex-row items-center gap-2 rounded-xl px-3 mt-3 border border-white bg-bg_tertiary">
 
           {/* <Text style={{ color: '#6B7280', fontSize: 14 }}>🔍</Text> */}
 
           <TextInput
-            className="flex-1 text-text_primary text-sm placeholder:text-text_primary"
+            className="flex-1 text-white text-sm placeholder:text-text_primary"
             placeholder="Buscar host ou IP..."
-            value={search}
-            onChangeText={setSearch}
+            // value={search}
+            returnKeyType='search'
+            onSubmitEditing={(e) => setSearch(e.nativeEvent.text)}
+            submitBehavior='submit'
             autoCapitalize="none"
             autoCorrect={false}
           />
           {/* Botão para limpar busca */}
           {search.length > 0 && (
-            <Text className="text-text_primary text-xs px-1" onPress={() => setSearch('')} >✕ </Text>
+            <Text className="text-white text-md px-1" onPress={() => setSearch('')} >✕ </Text>
           )}
         </View>
       </View>
@@ -119,9 +118,7 @@ export default function HostsScreen() {
         keyExtractor={item => `${item.serverId}-${item.hostid}`}
         renderItem={({ item, section }) => (
           <View className="px-4">
-            <HostCard
-              host={item}
-              showServer={selectedServerId === 'all'}
+            <HostCard host={item} showServer={selectedServerId === 'all'} 
               // Conta quantos problemas esse host específico tem
               problemCount={section.hasProblems ? 1 : 0}
             />

@@ -92,7 +92,7 @@ export default function HostDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-zabbix-dark items-center justify-center">
+      <SafeAreaView className="flex-1 bg-bg_secondary items-center justify-center">
         <ActivityIndicator color="#E94560" size="large" />
       </SafeAreaView>
     );
@@ -171,7 +171,7 @@ export default function HostDetailScreen() {
         </View>
 
         {/* Gráfico do item selecionado */}
-        {/* {chartItem && server && session && (
+        {chartItem && server && session && (
           <MiniChart
             serverUrl={server.url}
             token={session.session.token}
@@ -181,7 +181,7 @@ export default function HostDetailScreen() {
             units={chartItem.units}
             hours={3}
           />
-        )} */}
+        )}
 
         {/* Problemas ativos deste host */}
         {thisHostProblems.length > 0 && (
@@ -244,7 +244,7 @@ export default function HostDetailScreen() {
 // Componente auxiliar para os cards de informação do grid
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <View className="flex-1 rounded-xl p-3 border bg-text_secondary" >
+    <View className="flex-1 rounded-xl p-3 border border-white bg-text_secondary" >
       <Text className="text-white text-xs">{label}</Text>
       <Text className="text-white text-sm font-medium mt-0.5" numberOfLines={1}>
         {value}
