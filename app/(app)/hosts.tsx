@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, FlatList, TextInput, RefreshControl, ActivityIndicator, SectionList, } from 'react-native';
+import { View, Text, FlatList, TextInput, RefreshControl, ActivityIndicator, SectionList, TouchableOpacity, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHosts } from '../../src/hooks/useHosts';
 import { HostCard } from '../../src/components/HostCard';
@@ -24,8 +24,7 @@ export default function HostsScreen() {
 
   // Monta as seções para o SectionList
   // Hosts com problema ficam no topo para atenção imediata
-  const sections = [
-    ...(hostsWithProblems.length > 0
+  const sections = [...(hostsWithProblems.length > 0
       ? [{ title: `Com problemas · ${hostsWithProblems.length}`, data: hostsWithProblems, hasProblems: true }]
       : []),
     ...(hostsWithoutProblems.length > 0
@@ -74,24 +73,24 @@ export default function HostsScreen() {
         <FlatList
           horizontal
           data={[{ groupid: 'all', name: 'Todos' }, ...groups]}
-          keyExtractor={item => item.groupid}
+          keyExtractor={(item, index) => `chip_${item.groupid}_${index}`} //prefixo para evitar colisão em grupos com mesmo id em mais de um servidor cliente
           showsHorizontalScrollIndicator={false}
           contentContainerClassName="gap-1.5 px-4 py-2"
           renderItem={({ item }) => {
             const isActive = selectedGroupId === item.groupid;
             return (
-              <View
+              <TouchableOpacity
                 className={`px-3 py-1.5 rounded-full border ${isActive 
                     ? 'bg-text_secondary border-border_color'
                     : 'border-border_color bg-bg_primary'}`
                 }
                 // style={!isActive ? { backgroundColor: '#0F3460' } : undefined}
-                onTouchEnd={() => setSelectedGroupId(item.groupid)}
+                onPress={() => setSelectedGroupId(item.groupid)}
               >
                 <Text className={`text-xs ${isActive ? 'text-white font-semibold' : 'text-text_primary'}`}>
                   {item.name}
                 </Text>
-              </View>
+              </TouchableOpacity>
             );
           }}
         />
@@ -115,7 +114,7 @@ export default function HostsScreen() {
     <SafeAreaView className="flex-1 bg-bg_secondary" edges={['top']}>
       <SectionList
         sections={sections}
-        keyExtractor={item => `${item.serverId}-${item.hostid}`}
+        keyExtractor={(item, index) => `host_${item.serverId}_${item.hostid}_${index}` }
         renderItem={({ item, section }) => (
           <View className="px-4">
             <HostCard host={item} showServer={selectedServerId === 'all'} 

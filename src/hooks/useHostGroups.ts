@@ -30,7 +30,10 @@ export function useHostGroups(selectedServerId: 'all' | string) {
             // Evita duplicatas quando o mesmo grupo existe em múltiplos servidores
             if (!seen.has(group.name)) {
               seen.add(group.name);
-              allGroups.push(group);
+              allGroups.push({
+                groupid: `group_${group.name.replace(/\s+/g, '_').toLowerCase()}`,
+                name: group.name
+              });
             }
           }
         }

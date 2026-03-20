@@ -7,6 +7,8 @@ import { useFocusEffect } from 'expo-router';
 import { useNotificationsStore } from '../../src/stores/notifications.store';
 import { NotificationCard } from '../../src/components/NotificationCard';
 import type { AppNotification } from '../../src/api/zabbix.types';
+import { clearBadge } from '@/services/push.service';
+
 
 // Agrupa notificações por dia para exibição em seções
 function groupByDay(notifications: AppNotification[]) {
@@ -57,6 +59,15 @@ export default function NotificationsScreen() {
   //     if (unread > 0) markAllAsRead();
   //   }, [unread]),
   // );
+
+
+  useFocusEffect(
+  useCallback(() => {
+    if (unread > 0) markAllAsRead();
+      // Zera o badge do ícone do app ao abrir a tela
+      clearBadge();
+    }, [unread]),
+  );
 
   const sections = useMemo(() => groupByDay(notifications),
     [notifications],
@@ -154,4 +165,8 @@ export default function NotificationsScreen() {
       />
     </SafeAreaView>
   );
+}
+
+function markAllAsRead() {
+  throw new Error('Function not implemented.');
 }

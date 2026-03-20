@@ -4,8 +4,8 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
@@ -18,7 +18,9 @@
     "expo": "~55.0.6",
     "expo-checkbox": "~55.0.3",
     "expo-constants": "~55.0.7",
+    "expo-device": "~55.0.10",
     "expo-linking": "~55.0.7",
+    "expo-notifications": "~55.0.13",
     "expo-router": "~55.0.5",
     "expo-secure-store": "~55.0.8",
     "expo-status-bar": "~55.0.4",

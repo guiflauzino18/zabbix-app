@@ -80,9 +80,9 @@ export const useNotificationsStore = create<NotificationsState>((set, get) => ({
     if (alreadyExists) return;
 
     // Verifica se as configurações do servidor permitem essa severidade
-    const serverSettings = get().getSettings(data.serverId);
-    if (!serverSettings.enabled) return;
-    if (!serverSettings.severities[data.severity]) return;
+    // const serverSettings = get().getSettings(data.serverId);
+    // if (!serverSettings.enabled) return;
+    // if (!serverSettings.severities[data.severity]) return;
 
     const newNotification: AppNotification = {
       ...data,
