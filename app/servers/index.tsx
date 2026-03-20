@@ -22,11 +22,11 @@ function ServerCard({ server }: { server: ZabbixServer }) {
   };
 
   return (
-    <View className="bg-zabbix-surface border border-zabbix-card rounded-xl p-4 mb-3">
+    <View className="bg-bg_primary border border-border_color rounded-xl p-4 mb-3">
       <View className="flex-row items-center justify-between">
         <View className="flex-1">
-          <Text className="text-white font-semibold text-base">{server.name}</Text>
-          <Text className="text-gray-400 text-sm mt-0.5">{server.url}</Text>
+          <Text className="text-text_primary font-semibold text-base">{server.name}</Text>
+          <Text className="text-text_primary text-sm mt-0.5">{server.url}</Text>
           {server.apiVersion && (
             <Text className="text-gray-500 text-xs mt-1">
               API v{server.apiVersion}
@@ -37,7 +37,7 @@ function ServerCard({ server }: { server: ZabbixServer }) {
           onPress={handleDelete}
           className="ml-4 p-2 bg-red-900/30 rounded-lg"
         >
-          <Text className="text-red-400 text-sm">Remover</Text>
+          <Text className="text-red text-sm">Remover</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -48,15 +48,15 @@ export default function ServersScreen() {
   const { servers } = useServersStore();
 
   return (
-    <View className="flex-1 bg-zabbix-dark px-4 pt-14">
+    <View className="flex-1 bg-bg_secondary px-4 pt-14">
       <View className="flex-row items-center justify-between mb-6">
         <TouchableOpacity onPress={() => router.back()}>
-          <Text className="text-gray-400 text-base">← Voltar</Text>
+          <Text className="text-text_primary text-base">← Voltar</Text>
         </TouchableOpacity>
-        <Text className="text-white text-xl font-bold">Servidores</Text>
+        <Text className="text-text_primary text-xl font-bold">Servidores</Text>
         <Link href="/servers/add" asChild>
           <TouchableOpacity>
-            <Text className="text-zabbix-accent font-semibold">+ Novo</Text>
+            <Text className="text-text_secondary font-semibold">+ Novo</Text>
           </TouchableOpacity>
         </Link>
       </View>
@@ -67,7 +67,7 @@ export default function ServersScreen() {
         renderItem={({ item }) => <ServerCard server={item} />}
         ListEmptyComponent={
           <View className="items-center py-12">
-            <Text className="text-gray-500 text-base">Nenhum servidor ainda</Text>
+            <Text className="text-text_primary text-base">Nenhum servidor ainda</Text>
           </View>
         }
       />

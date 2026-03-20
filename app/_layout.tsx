@@ -5,6 +5,7 @@ import { useAuthStore } from '../src/stores/auth.store';
 import { useServersStore } from '../src/stores/servers.store';
 import '../global.css'; // nativewind
 import { View } from 'react-native';
+import { useNotificationsStore } from '@/stores/notifications.store';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,6 +25,8 @@ export default function RootLayout() {
   useEffect(() => {
     loadSessions();
     loadServers();
+    // Carrega notificações e configurações persistidas
+    useNotificationsStore.getState().load();
   }, []);
 
   return (
