@@ -101,3 +101,59 @@ export const SEVERITY_BG: Record<ZabbixSeverity, string> = {
   4: '#3b2010',
   5: '#3b1515',
 };
+
+
+
+// Status de disponibilidade do host
+export type ZabbixHostAvailability = '0' | '1' | '2';
+// 0 = desconhecido, 1 = disponível, 2 = indisponível
+
+export interface ZabbixHost {
+  hostid: string;
+  host: string;           // nome técnico
+  name: string;           // nome visível
+  status: '0' | '1';     // 0 = monitorado, 1 = não monitorado
+  available: ZabbixHostAvailability;
+  interfaces: ZabbixHostInterface[];
+  groups: Array<{ groupid: string; name: string }>;
+  items?: ZabbixItem[];
+}
+
+export interface ZabbixHostInterface {
+  interfaceid: string;
+  ip: string;
+  dns: string;
+  port: string;
+  main: '0' | '1';       // 1 = interface principal
+  type: '1' | '2' | '3' | '4'; // 1=agent, 2=snmp, 3=ipmi, 4=jmx
+}
+
+export interface ZabbixItem {
+  itemid: string;
+  name: string;
+  key_: string;
+  lastvalue: string;
+  lastclock: string;
+  units: string;
+  value_type: '0' | '1' | '2' | '3' | '4';
+  // 0=float, 1=char, 2=log, 3=int, 4=text
+  delay: string;
+}
+
+export interface ZabbixHostGroup {
+  groupid: string;
+  name: string;
+}
+
+// Helper para obter o IP principal do host
+export function getHostMainIp(host: ZabbixHost): string {
+  const main = host.interfaces?.find(i => i.main === '1');
+  return main?.ip || main?.dns || 'N/A';
+}
+
+// Helper para mapear disponibilidade para label e cor
+export const HOST_AVAILABILITY: Record<ZabbixHostAvailability,{ label: string; color: string; dot: string }> = {
+  '0': { label: 'Desconhecido', color: '#6B7280', dot: '#6B7280' },
+  '1': { label: 'Disponível',   color: '#4ade80', dot: '#4ade80' },
+  '2': { label: 'Indisponível', color: '#E45959', dot: '#E45959' },
+};
