@@ -75,7 +75,7 @@ export default function LoginScreen() {
               
             </View>
 
-            <View className='flex-1'>
+            <View className='flex-1 justify-center'>
 
               {/* Logo / Header */}
               <View className="items-center mb-10 bg-red rounded-md p-4">
@@ -239,6 +239,10 @@ export default function LoginScreen() {
 
               </>
             )}
+          </View>
+
+          <View className='p-2 mb-1 items-center'>
+            <Text className='text-text_primary text-sm'>v1.0.0 {new Date().getFullYear()}</Text>
           </View>
         </ScrollView>
       

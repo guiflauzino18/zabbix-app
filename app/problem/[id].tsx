@@ -142,7 +142,8 @@ export default function ProblemDetailScreen() {
   const severityColor = SEVERITY_COLORS[severity];
   const isAcknowledged = problem.acknowledged === '1';
   let isSuppressed = problem.suppressed === '1';
-  let manualClose = problem.trigger.manual_close == '1'
+  let manualClose: boolean | undefined = undefined
+  if (problem.trigger != undefined) manualClose = problem.trigger.manual_close === '1'
 
   function renderModal(props: ModalKnowledgeProps){
     return <ModalAcknowledge  visible={props.visible} type={props.type} title={props.title} onConfirm={props.onConfirm} onCancel={props.onCancel}/>
