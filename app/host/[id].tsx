@@ -9,7 +9,7 @@ import { useServersStore } from "@/stores/servers.store";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, router } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, View, ScrollView, RefreshControl, TouchableOpacity, Text } from "react-native";
+import { ActivityIndicator, View, ScrollView, RefreshControl, TouchableOpacity, Text, Pressable } from "react-native";
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
@@ -145,7 +145,9 @@ export default function HostDetailScreen() {
         {/* Card de status geral */}
         <View className="rounded-xl p-3 border border-border_color flex-row items-center gap-3 bg-bg_primary">
 
-          <View className={`w-3 h-3 rounded-full bg-[${availability.dot}]`}/>
+          <View className={`w-3 h-3 rounded-full`}
+            style={{ backgroundColor: availability.dot }}
+          />
 
           <Text className="text-sm font-medium flex-1" style={{ color: availability.color }} >
             {thisHostProblems.length > 0
@@ -201,7 +203,7 @@ export default function HostDetailScreen() {
             ÚLTIMOS VALORES
           </Text>
           {items.map(item => (
-            <TouchableOpacity
+            <Pressable
               key={item.itemid}
               // Toca no item para selecionar e exibir seu gráfico
               onPress={() =>
@@ -209,13 +211,14 @@ export default function HostDetailScreen() {
                   ? setSelectedItemId(item.itemid)
                   : null
               }
-              className={`rounded-lg px-3 py-2.5 mb-1 border border-border_color flex-row items-center ${selectedItemId === item.itemid 
-                ? 'bg-gb_primary'
-                : 'bg-bg_primary'
+              className={`rounded-lg px-3 py-2.5 mb-1 border border-border_color flex-row items-center 
+                ${selectedItemId === item.itemid 
+                  ? 'bg-bg_tertiary'
+                  : 'bg-bg_primary'
               }`}
             >
               <View className="flex-1">
-                <Text className="text-text_primary text-xs" numberOfLines={1}>
+                <Text className={`text-xs ${selectedItemId === item.itemid ? 'text-white' : 'text-text_primary'} `} numberOfLines={1}>
                   {item.name}
                 </Text>
                 <Text className="text-text_primary text-xs mt-1">
@@ -233,7 +236,7 @@ export default function HostDetailScreen() {
               >
                 {formatItemValue(item)}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
       </ScrollView>
@@ -244,7 +247,7 @@ export default function HostDetailScreen() {
 // Componente auxiliar para os cards de informação do grid
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <View className="flex-1 rounded-xl p-3 border border-white bg-text_secondary" >
+    <View className="flex-1 rounded-xl p-3 border border-white bg-bg_tertiary" >
       <Text className="text-white text-xs">{label}</Text>
       <Text className="text-white text-sm font-medium mt-0.5" numberOfLines={1}>
         {value}

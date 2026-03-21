@@ -206,3 +206,48 @@ export const DEFAULT_NOTIFICATION_SETTINGS: Omit<NotificationSettings, 'serverId
   quietHoursStart: '22:00',
   quietHoursEnd: '07:00',
 };
+
+
+// Período selecionado para o relatório
+export interface ReportPeriod {
+  label: string;
+  days: number;
+  from: Date;
+  to: Date;
+}
+
+// Dados calculados do relatório
+export interface ReportData {
+  period: ReportPeriod;
+  totalProblems: number;
+  totalProblemsPrev: number;   // período anterior para comparação
+  mttrSeconds: number;         // tempo médio de resolução em segundos
+  mttrSecondsPrev: number;
+  availability: number;        // porcentagem 0-100
+  availabilityPrev: number;
+  hostsAffected: number;
+  totalHosts: number;
+  bySeverity: Record<ZabbixSeverity, number>;
+  topHosts: Array<{
+    hostName: string;
+    count: number;
+    serverId: string;
+    serverName: string;
+  }>;
+  serverBreakdown: Array<{
+    serverId: string;
+    serverName: string;
+    count: number;
+  }>;
+}
+
+// Opções de exportação
+export interface ExportOptions {
+  period: ReportPeriod;
+  serverIds: string[];         // vazio = todos
+  format: 'pdf' | 'csv' | 'json';
+  includeSummary: boolean;
+  includeTopHosts: boolean;
+  includeAvailability: boolean;
+  includeEventList: boolean;
+}

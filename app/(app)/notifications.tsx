@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, Alert,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
@@ -53,17 +54,10 @@ export default function NotificationsScreen() {
 
   const unread = unreadCount();
 
-  // Marca todas como lidas ao entrar na tela
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     if (unread > 0) markAllAsRead();
-  //   }, [unread]),
-  // );
-
 
   useFocusEffect(
-  useCallback(() => {
-    if (unread > 0) markAllAsRead();
+    useCallback(() => {
+      // if (unread > 0) markAllAsRead();
       // Zera o badge do ícone do app ao abrir a tela
       clearBadge();
     }, [unread]),
@@ -121,14 +115,14 @@ export default function NotificationsScreen() {
 
           <View className="flex-row gap-3 items-center">
             {notifications.length > 0 && (
-              <TouchableOpacity onPress={handleClearAll}>
+              <Pressable onPress={handleClearAll}>
                 <Text className="text-text_primary text-xs">Limpar</Text>
-              </TouchableOpacity>
+              </Pressable>
             )}
             {unread > 0 && (
-              <TouchableOpacity onPress={() => markAllAsRead()}>
+              <Pressable onPress={() => markAllAsRead()}>
                 <Text className="text-text_secondary text-xs">Marcar lidas</Text>
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
         </View>

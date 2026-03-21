@@ -39,7 +39,15 @@
           "androidMode": "default",
           "androidCollapsedTitle": "ZabbixApp"
         }
-      ]
+      ],
+      [
+        "expo-file-system",
+        {
+          "supportsOpeningDocumentsInPlace": true,
+          "enableFileSharing": true
+        }
+      ],
+      "expo-sharing"
     ]
   }
 }

@@ -36,12 +36,12 @@ function Chip({ label, isActive, onPress }: { label: string; isActive: boolean; 
       onPress={onPress}
       className={`px-3.5 py-1.5 rounded-full border ${
         isActive
-          ? 'bg-text_secondary border-text_secondary'
-          : 'bg-bg_primary border-border'
+          ? 'bg-bg_tertiary border-white'
+          : 'bg-bg_primary border-border_color'
       }`}
     >
       <Text
-        className={`text-xs ${isActive ? 'text-white font-semibold' : 'text-primary'}`}
+        className={`text-xs ${isActive ? 'text-white font-semibold' : 'text-text_primary'}`}
       >
         {label}
       </Text>

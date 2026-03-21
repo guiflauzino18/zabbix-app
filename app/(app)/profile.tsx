@@ -32,7 +32,7 @@ export default function ProfileScreen() {
 
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, gap: 12 }}>
         {/* Info do usuário */}
-        <View className="rounded-xl p-4 border border-border_color bg-bg_tertiary">
+        <View className="rounded-xl p-4 border border-white bg-bg_tertiary">
           <View
             className="w-12 h-12 rounded-full items-center justify-center mb-3 bg-[#E94560]">
             <Text className="text-white text-lg font-bold">

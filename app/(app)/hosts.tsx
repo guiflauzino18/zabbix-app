@@ -80,8 +80,9 @@ export default function HostsScreen() {
             const isActive = selectedGroupId === item.groupid;
             return (
               <TouchableOpacity
-                className={`px-3 py-1.5 rounded-full border ${isActive 
-                    ? 'bg-text_secondary border-border_color'
+                className={`px-3 py-1.5 rounded-full border 
+                  ${isActive 
+                    ? 'bg-bg_tertiary border-border_color'
                     : 'border-border_color bg-bg_primary'}`
                 }
                 // style={!isActive ? { backgroundColor: '#0F3460' } : undefined}

@@ -3,14 +3,14 @@ import { useAuthStore } from '../../src/stores/auth.store';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Text, View } from 'react-native';
 import { useNotificationsStore } from '@/stores/notifications.store';
-import { useNotificationPoller } from '@/hooks/useNotificationPoller';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 
   interface tabicon {
     name: any,
     size: number,
     color: string,
-    active: boolean
+    active: boolean,
+
   }
 
   function TabIcon(icon: tabicon){
@@ -59,6 +59,7 @@ function AppLayoutInner() {
       <Tabs.Screen name='dashboard' options={{title: 'Dashboard', tabBarIcon: ({focused}) => <TabIcon active={focused} name={'dashboard'} size={20} color='black'/> }}/>
       <Tabs.Screen name='hosts' options={{title: 'Hosts', tabBarIcon: ({focused}) => <TabIcon active={focused} name={'server'} size={20} color='black'/> }}/>
       <Tabs.Screen name='notifications' options={{title: 'Notificações', tabBarIcon: ({focused}) => <TabIcon active={focused} name={'bell'} size={20} color='black'/> }}/>
+      <Tabs.Screen name='reports' options={{title: 'Relatórios', tabBarIcon: ({focused}) => <TabIcon active={focused} name={'pie-chart'} size={20} color='black'/> }}/>
       <Tabs.Screen name='profile' options={{title: 'Perfil', tabBarIcon: ({focused}) => <TabIcon active={focused} name={'user'} size={20} color='black'/> }}/>
     </Tabs>
 
