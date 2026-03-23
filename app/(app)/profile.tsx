@@ -1,14 +1,16 @@
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Alert, Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAuth } from '../../src/hooks/useAuth';
 import { useServersStore } from '../../src/stores/servers.store';
 import { useAuthStore } from '../../src/stores/auth.store';
+import { useThemeStore } from '@/stores/theme.store';
 
 export default function ProfileScreen() {
   const { currentUser, logoutAll } = useAuth();
   const { servers } = useServersStore();
   const { sessions } = useAuthStore();
+  const { mode, toggleTheme } = useThemeStore(); 
 
   const handleLogoutAll = () => {
     Alert.alert(
@@ -32,19 +34,26 @@ export default function ProfileScreen() {
 
       <ScrollView className="flex-1" contentContainerStyle={{ padding: 16, gap: 12 }}>
         {/* Info do usuário */}
-        <View className="rounded-xl p-4 border border-white bg-bg_tertiary">
-          <View
-            className="w-12 h-12 rounded-full items-center justify-center mb-3 bg-[#E94560]">
-            <Text className="text-white text-lg font-bold">
-              {currentUser?.name?.[0]?.toUpperCase() ?? 'U'}
-            </Text>
+        <View className="rounded-xl p-4 border border-white bg-bg_tertiary flex-row items-end">
+          <View className='flex-1'>
+              <View
+                className="w-12 h-12 rounded-full items-center justify-center mb-3 bg-[#E94560]">
+                <Text className="text-white text-lg font-bold">
+                  {currentUser?.name?.[0]?.toUpperCase() ?? 'U'}
+                </Text>
+              </View>
+              <Text className="text-white text-base font-semibold">
+                {currentUser?.name} {currentUser?.surname}
+              </Text>
+              <Text className="text-gray-400 text-sm mt-0.5">
+                @{currentUser?.username}
+              </Text>
           </View>
-          <Text className="text-white text-base font-semibold">
-            {currentUser?.name} {currentUser?.surname}
-          </Text>
-          <Text className="text-gray-400 text-sm mt-0.5">
-            @{currentUser?.username}
-          </Text>
+
+          <View className='flex-row items-center gap-2'>
+            <Text className='text-white'>Dark Mode</Text>
+            <Switch value={mode === 'dark'} onChange={toggleTheme}/>
+          </View>
         </View>
 
         {/* Configurações de notificação por servidor */}

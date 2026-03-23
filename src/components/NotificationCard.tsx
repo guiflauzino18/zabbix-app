@@ -37,7 +37,6 @@ export function NotificationCard({ notification: n }: Props) {
       onPress={handlePress}
       className={`rounded-xl p-3 mb-2 border border-border_color ${n.isRead ? 'bg-bg_primary' : 'bg-bg_tertiary' }`}
       style={{
-        // backgroundColor: n.isRead ? '#ffffff' : '#0A466A',
         // Borda esquerda colorida apenas para não lidas
         borderLeftWidth: n.isRead ? 0.5 : 3,
         borderLeftColor: n.isRead ? '#0A466A' : severityColor,

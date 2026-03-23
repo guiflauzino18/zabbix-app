@@ -135,12 +135,13 @@ export default function HostDetailScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
-            refreshing={false}
-            onRefresh={refetchItems}
-            tintColor="#E94560"
-            colors={['#E94560']}
+          refreshing={false}
+          onRefresh={refetchItems}
+          tintColor="#E94560"
+          colors={['#E94560']}
           />
         }
+        stickyHeaderIndices={[1, 2]}
       >
         {/* Card de status geral */}
         <View className="rounded-xl p-3 border border-border_color flex-row items-center gap-3 bg-bg_primary">
