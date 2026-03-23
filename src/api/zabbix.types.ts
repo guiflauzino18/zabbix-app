@@ -70,7 +70,7 @@ export interface ZabbixTrigger {
   value: string;
   lastchange: string;
   manual_close: string
-  hosts: Array<{ hostid: string; name: string }>;
+  hosts: Array<{ hostid: string; name: string; status: number }>;
 }
 
 export type ZabbixSeverity = 0 | 1 | 2 | 3 | 4 | 5;

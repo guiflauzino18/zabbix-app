@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity,
   RefreshControl, ActivityIndicator,
@@ -15,7 +15,7 @@ import type { ZabbixSeverity } from '../../src/api/zabbix.types';
 import { Checkbox } from 'expo-checkbox';
 import { router, useFocusEffect } from 'expo-router';
 
-const SEVERITY_FILTERS: ZabbixSeverity[] = [5, 4, 3, 2, 1];
+let SEVERITY_FILTERS: ZabbixSeverity[] = [5, 4, 3, 2];
 
 export default function DashboardScreen() {
   const { currentUser, session, logoutAll } = useAuth();
@@ -23,10 +23,15 @@ export default function DashboardScreen() {
   const activeSessions = useActiveSessions();
   const [selectedServerId, setSelectedServerId] = useState<'all' | string>('all');
   const [showSuppressed, setShowSuppressed] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const [activeSeverity, setActiveSeverity] = useState<ZabbixSeverity | null>(null);
   const severityFilter = activeSeverity !== null ? [activeSeverity] : undefined;
   const { problems, isLoading, isRefetching, refetch, countBySeverity, totalCount } = useProblems({ selectedServerId, severityFilter, showSuppressed });
   const activeServer = servers.find(s => s.id === session?.serverId);
+
+  // useEffect(() => {
+  //   SEVERITY_FILTERS.push(1)
+  // }, [showInfo])
 
   useFocusEffect(
     useCallback(() => {
@@ -37,8 +42,6 @@ export default function DashboardScreen() {
   const handleSeverityPress = useCallback((sev: ZabbixSeverity) => {
     setActiveSeverity(prev => (prev === sev ? null : sev));
   }, [])
-
-
 
 
   const renderHeader = () => (
@@ -110,7 +113,7 @@ export default function DashboardScreen() {
       {activeSeverity !== null && (
         <View className="flex-row items-center rounded-sm justify-between px-4 mb-2">
           <Text className="text-text_primary text-xs">Filtrando por severidade</Text>
-          <TouchableOpacity onPress={() => setActiveSeverity(null)}>
+          <TouchableOpacity onPress={() => {setActiveSeverity(null); setShowInfo(false)}}>
             <Text className="text-text_primary text-xs">Limpar filtro</Text>
           </TouchableOpacity>
         </View>
@@ -122,9 +125,17 @@ export default function DashboardScreen() {
           {problems.length} problema{problems.length !== 1 ? 's' : ''} encontrado{problems.length !== 1 ? 's' : ''}
         </Text>
         
-        <View className='flex-row gap-1'>
-          <Checkbox className='h-1' value={showSuppressed} onValueChange={(check) =>setShowSuppressed(check)}/>
-          <Text className='text-sm text-text_primary'>Exibir suprimidos</Text>
+        <View className='flex gap-2'>
+
+          <View className='flex-row gap-1 items-center'>
+            <Checkbox className='h-1' value={showSuppressed} onValueChange={(check) =>setShowSuppressed(check)}/>
+            <Text className='text-xs text-text_primary'>Exibir suprimidos</Text>
+          </View>
+
+          <View className='flex-row gap-1 items-center'>
+            <Checkbox  className='h-1' value={showInfo} onValueChange={(check) => {setShowInfo(check); setActiveSeverity(check ? 1 : null)}}/>
+            <Text className='text-xs text-text_primary'>Exibir Informações</Text>
+          </View>
         </View>
       </View>
     </View>

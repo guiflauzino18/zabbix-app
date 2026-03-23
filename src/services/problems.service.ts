@@ -46,7 +46,8 @@ export async function fetchProblems(options: FetchProblemsOptions,): Promise<Zab
     sortfield: ['eventid'],
     sortorder: 'DESC',
     limit,
-    suppressed: false
+    suppressed: false,
+    severities: [5,4,3,2]
   };
 
 
@@ -100,7 +101,7 @@ export async function fetchProblemsWithHosts(options: FetchProblemsOptions,): Pr
   );
 
 
-  return problems.map(p => {
+  let problemsAndtriggers = problems.map(p => {
     const trigger = triggerMap.get(p.objectid);
     const hostName = trigger?.hosts?.[0]?.name ?? 'Host desconhecido';
     return {
@@ -111,6 +112,8 @@ export async function fetchProblemsWithHosts(options: FetchProblemsOptions,): Pr
       trigger: trigger!
     };
   });
+
+  return problemsAndtriggers.filter((item) => item.trigger.status === '0')
 }
 
 export async function acknowledgeProblems(serverUrl: string,token: string,eventids: string[],message: string,): Promise<void> {

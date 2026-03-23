@@ -51,13 +51,14 @@ export function useProblems({selectedServerId, severityFilter, refetchInterval =
         }
       }
 
-      return allProblems
+      // Ordena problemas pela hora mais recente
+      return allProblems.sort((a, b) => {
+        // const sevDiff = parseInt(b.severity) - parseInt(a.severity);
+        // if (sevDiff !== 0) return sevDiff;
+        return parseInt(b.clock) - parseInt(a.clock);
+      });
 
-      // return allProblems.sort((a, b) => {
-      //   const sevDiff = parseInt(b.severity) - parseInt(a.severity);
-      //   if (sevDiff !== 0) return sevDiff;
-      //   return parseInt(b.clock) - parseInt(a.clock);
-      // });
+
     },
     refetchInterval,
     enabled: serversToFetch.length > 0,
