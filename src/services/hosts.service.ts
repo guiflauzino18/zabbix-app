@@ -24,10 +24,7 @@ export async function fetchHosts(
 }
 
 // Busca grupos de hosts para popular o seletor de filtro
-export async function fetchHostGroups(
-  serverUrl: string,
-  token: string,
-): Promise<ZabbixHostGroup[]> {
+export async function fetchHostGroups( serverUrl: string, token: string, ): Promise<ZabbixHostGroup[]> {
   return zabbixRequest<ZabbixHostGroup[]>(
     serverUrl,
     'hostgroup.get',

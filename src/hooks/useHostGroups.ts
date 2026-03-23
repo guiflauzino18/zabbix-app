@@ -6,8 +6,7 @@ import type { ZabbixHostGroup } from '../api/zabbix.types';
 export function useHostGroups(selectedServerId: 'all' | string) {
   const activeSessions = useActiveSessions();
 
-  const serversToFetch =
-    selectedServerId === 'all'
+  const serversToFetch = selectedServerId === 'all'
       ? activeSessions
       : activeSessions.filter(s => s.server.id === selectedServerId);
 
@@ -22,19 +21,11 @@ export function useHostGroups(selectedServerId: 'all' | string) {
       );
 
       const allGroups: ZabbixHostGroup[] = [];
-      const seen = new Set<string>();
 
       for (const result of results) {
         if (result.status === 'fulfilled') {
           for (const group of result.value) {
-            // Evita duplicatas quando o mesmo grupo existe em múltiplos servidores
-            if (!seen.has(group.name)) {
-              seen.add(group.name);
-              allGroups.push({
-                groupid: `group_${group.name.replace(/\s+/g, '_').toLowerCase()}`,
-                name: group.name
-              });
-            }
+            allGroups.push(group)
           }
         }
       }

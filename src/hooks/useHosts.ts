@@ -39,8 +39,7 @@ export function useHosts({ selectedServerId, groupId, search, }: UseHostsOptions
     queryKey: [ 'hosts', selectedServerId, activeSessions.map(s => s.server.id).join(',')],
     queryFn: async (): Promise<HostWithServer[]> => {
       // Busca hosts de todos os servidores selecionados em paralelo
-      const results = await Promise.allSettled(
-        serversToFetch.map(async ({ server, token }) => {
+      const results = await Promise.allSettled(serversToFetch.map(async ({ server, token }) => {
           const hosts = await fetchHosts(server.url, token);
           return hosts.map(h => ({
             ...h,
