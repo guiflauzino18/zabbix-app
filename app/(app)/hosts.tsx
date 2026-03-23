@@ -63,6 +63,7 @@ export default function HostsScreen() {
         </View>
       </View>
 
+
       {/* Seletor de servidor */}
       <View className="pt-3">
         <ServerSelector selected={selectedServerId} onSelect={setSelectedServerId} />

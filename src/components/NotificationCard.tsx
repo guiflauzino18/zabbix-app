@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, Text } from 'react-native';
+import { TouchableOpacity, View, Text, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { useNotificationsStore } from '../stores/notifications.store';
 import { SEVERITY_COLORS, SEVERITY_LABELS, type AppNotification, type ZabbixSeverity } from '../api/zabbix.types';
@@ -33,7 +33,7 @@ export function NotificationCard({ notification: n }: Props) {
   };
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={handlePress}
       className={`rounded-xl p-3 mb-2 border border-border_color ${n.isRead ? 'bg-bg_primary' : 'bg-bg_tertiary' }`}
       style={{
@@ -41,7 +41,7 @@ export function NotificationCard({ notification: n }: Props) {
         // Borda esquerda colorida apenas para não lidas
         borderLeftWidth: n.isRead ? 0.5 : 3,
         borderLeftColor: n.isRead ? '#0A466A' : severityColor,
-        opacity: n.isResolved ? 0.6 : 1,
+        opacity: n.isResolved ? 0.85 : 1,
       }}
     >
       <View className="flex-row items-start gap-2">
@@ -91,6 +91,6 @@ export function NotificationCard({ notification: n }: Props) {
           </View>
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
