@@ -14,8 +14,10 @@ import { SeverityCounter } from '../../src/components/ui/SeverityCounter';
 import type { ZabbixSeverity } from '../../src/api/zabbix.types';
 import { Checkbox } from 'expo-checkbox';
 import { router, useFocusEffect } from 'expo-router';
+import { ErrorState } from '@/components/ui/ErrorState';
 
 let SEVERITY_FILTERS: ZabbixSeverity[] = [5, 4, 3, 2];
+const PROBLEM_CARD_HEIGHT = 86 //Quando os itens têm altura fixa, o FlatList pode calcular o layout sem medir cada item. Ótimo para desempenho
 
 export default function DashboardScreen() {
   const { currentUser, session, logoutAll } = useAuth();
@@ -26,12 +28,9 @@ export default function DashboardScreen() {
   const [showInfo, setShowInfo] = useState(false)
   const [activeSeverity, setActiveSeverity] = useState<ZabbixSeverity | null>(null);
   const severityFilter = activeSeverity !== null ? [activeSeverity] : undefined;
-  const { problems, isLoading, isRefetching, refetch, countBySeverity, totalCount } = useProblems({ selectedServerId, severityFilter, showSuppressed });
+  const { problems, isLoading, isRefetching, refetch, countBySeverity, totalCount, error } = useProblems({ selectedServerId, severityFilter, showSuppressed });
   const activeServer = servers.find(s => s.id === session?.serverId);
 
-  // useEffect(() => {
-  //   SEVERITY_FILTERS.push(1)
-  // }, [showInfo])
 
   useFocusEffect(
     useCallback(() => {
@@ -42,6 +41,7 @@ export default function DashboardScreen() {
   const handleSeverityPress = useCallback((sev: ZabbixSeverity) => {
     setActiveSeverity(prev => (prev === sev ? null : sev));
   }, [])
+
 
 
   const renderHeader = () => (
@@ -141,6 +141,7 @@ export default function DashboardScreen() {
     </View>
   );
 
+  
   const renderEmpty = () => {
     if (isLoading) return null;
     return (
@@ -158,17 +159,6 @@ export default function DashboardScreen() {
     );
   };
 
-  if (isLoading) {
-    return (
-      <SafeAreaView className="flex-1 bg-bg_secondary mx-2">
-        {renderHeader()}
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#E94560" size="large" />
-          <Text className="text-text_primary text-sm mt-3">Carregando incidentes...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView className="flex-1 bg-bg_secondary" edges={['top']}>
@@ -180,6 +170,15 @@ export default function DashboardScreen() {
             <ProblemCard problem={item} showServer={selectedServerId === 'all'} />
           </View>
         )}
+        getItemLayout={(_, index) => ({ // Evita o FlatList medir cada item individualmente
+          length: PROBLEM_CARD_HEIGHT,
+          offset: PROBLEM_CARD_HEIGHT * index,
+          index
+        })}
+        windowSize={10}   // Mantém mais itens renderizados para scroll mais suave
+        maxToRenderPerBatch={8}
+        initialNumToRender={12}
+        removeClippedSubviews={true}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
         refreshControl={

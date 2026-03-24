@@ -4,6 +4,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Text, View } from 'react-native';
 import { useNotificationsStore } from '@/stores/notifications.store';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useNetworkError } from '@/hooks/useNetworkError';
 
   interface tabicon {
     name: any,
@@ -41,13 +42,15 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 
 function AppLayoutInner() {
-  // Ativa o poller de notificações — roda enquanto o app estiver na tela
-  usePushNotifications();
+  
+  usePushNotifications(); // Ativa o poller de notificações — roda enquanto o app estiver na tela
+  useNetworkError();
 
   return (
     <Tabs 
       screenOptions={{
         headerShown: false,
+        lazy: true,
         tabBarStyle: {
           backgroundColor: '#EBEEF0',
           borderTopWidth: 0.5

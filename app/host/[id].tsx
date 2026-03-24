@@ -1,6 +1,7 @@
 import { ZabbixItem, HOST_AVAILABILITY, getHostMainIp } from "@/api/zabbix.types";
 import { MiniChart } from "@/components/MiniChart";
 import { ProblemCard } from "@/components/ProblemCard";
+import { ErrorState } from "@/components/ui/ErrorState";
 import { useHostDetail } from "@/hooks/useHostsDetail";
 import { useProblems } from "@/hooks/useProblems";
 import { fetchHosts } from "@/services/hosts.service";
@@ -62,7 +63,7 @@ export default function HostDetailScreen() {
   const { items, itemsLoading, refetchItems } = useHostDetail(hostid, serverId);
 
   // Busca dados do host específico para exibir status e IP
-  const { data: hostData, isLoading: hostLoading } = useQuery({
+  const { data: hostData, isLoading: hostLoading, error, refetch} = useQuery({
     queryKey: ['host-detail', hostid, serverId],
     queryFn: async () => {
       const hosts = await fetchHosts(server!.url, session!.session.token);
@@ -112,6 +113,18 @@ export default function HostDetailScreen() {
       </SafeAreaView>
     );
   }
+
+
+    if (error) {
+      return (
+        <SafeAreaView className="flex-1 bg-bg_primary">
+          <ErrorState
+            message="Erro ao carregar Host"
+            onRetry={refetch}
+          />
+      </SafeAreaView>
+      )
+    }
 
   const availability = HOST_AVAILABILITY[hostData.available ?? '0'];
   const ip = getHostMainIp(hostData);

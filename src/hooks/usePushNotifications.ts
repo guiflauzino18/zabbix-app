@@ -12,13 +12,11 @@ import { useProblems } from './useProblems';
 import type { ZabbixSeverity } from '../api/zabbix.types';
 import { SEVERITY_LABELS } from '../api/zabbix.types';
 
-const POLL_INTERVAL = 60_000;
+//Definir jitter (variação aleatória para distribuir as requisições e evitar gargalo quando mútiplos servidores fazerem requisições simultaneament.)
+const POLL_INTERVAL = 60_000 + Math.random() * 10_000
 
 export function usePushNotifications() {
-  const { problems } = useProblems({
-    selectedServerId: 'all',
-    refetchInterval: POLL_INTERVAL,
-  });
+  const { problems } = useProblems({selectedServerId: 'all', refetchInterval: POLL_INTERVAL});
 
   const { notifications, addNotification, markResolved, getSettings } = useNotificationsStore();
 

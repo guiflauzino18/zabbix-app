@@ -9,6 +9,7 @@ import React, { Key, useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/auth.store';
 import { acknowledgeProblems, closeProblem, fetchProblemsWithHosts, suppressProblems, SuppressProblemsOptions, unsuppressProblems } from '@/services/problems.service';
 import ModalAcknowledge, { ModalKnowledgeProps } from '@/components/ModalAcknowledge';
+import { ErrorState } from '@/components/ui/ErrorState';
 
 
 function formatDate(clock: string) {
@@ -123,12 +124,6 @@ export default function ProblemDetailScreen() {
 
   };
 
-  
-  if (isError){
-     return <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center'}}>
-        <Text>Erro:{error?.message}</Text>
-      </SafeAreaView>
-  }
 
   if (isLoading || !problem ) {
     return (
@@ -136,6 +131,17 @@ export default function ProblemDetailScreen() {
         <ActivityIndicator color="#E94560" />
       </SafeAreaView>
     );
+  }
+
+    if (error) {
+    return (
+      <SafeAreaView className="flex-1 bg-bg_primary">
+        <ErrorState
+          message="Erro ao carregar incidente"
+          onRetry={refetch}
+        />
+    </SafeAreaView>
+    )
   }
 
   const severity = parseInt(problem.severity) as ZabbixSeverity;

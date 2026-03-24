@@ -5,6 +5,7 @@ import { useHosts } from '../../src/hooks/useHosts';
 import { HostCard } from '../../src/components/HostCard';
 import { ServerSelector } from '../../src/components/ServerSelector';
 import { useHostGroups } from '@/hooks/useHostGroups';
+import { ErrorState } from '@/components/ui/ErrorState';
 
 export default function HostsScreen() {
   const [selectedServerId, setSelectedServerId] = useState<'all' | string>('all');
@@ -17,6 +18,7 @@ export default function HostsScreen() {
     isLoading,
     isRefetching,
     refetch,
+    error,
     totalCount,
   } = useHosts({ selectedServerId, groupId: selectedGroupId, search });
 
@@ -111,6 +113,18 @@ export default function HostsScreen() {
       </SafeAreaView>
     );
   }
+
+    if (error) {
+      return (
+        <SafeAreaView className="flex-1 bg-bg_primary">
+          {renderHeader()}
+          <ErrorState
+            message="Erro ao carregar hosts"
+            onRetry={refetch}
+          />
+      </SafeAreaView>
+      )
+    }
 
   return (
     <SafeAreaView className="flex-1 bg-bg_secondary" edges={['top']}>

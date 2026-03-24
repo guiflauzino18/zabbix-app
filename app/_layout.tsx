@@ -7,15 +7,21 @@ import '../global.css'; // nativewind
 import { View } from 'react-native';
 import { useNotificationsStore } from '@/stores/notifications.store';
 import { useThemeStore } from '@/stores/theme.store';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 2,
-      staleTime: 30_000,
-      refetchOnMount: true, // sempre refetch ao montar
-      refetchOnWindowFocus: true,
+      staleTime: 0, // staleTime por tipo de dado — dados que mudam pouco ficam em cache mais tempo
+      gcTime: 5 * 60_000,       // mantém no cache por 5min após desmontar
+      refetchOnMount: true,
+      refetchOnWindowFocus: false, // evita refetch agressivo ao voltar para o app
+      refetchOnReconnect: true,   // mas sempre refaz ao reconectar a rede
     },
+    mutations: {
+      retry: 1
+    }
   },
 });
 
@@ -32,10 +38,12 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <View id='root-view' className={`flex-1 ${mode === 'dark' ? 'dark' : 'root'}`}>
-        <Stack screenOptions={{ headerShown: false }} />
-      </View>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <View id='root-view' className={`flex-1 ${mode === 'dark' ? 'dark' : 'root'}`}>
+          <Stack screenOptions={{ headerShown: false }} />
+        </View>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
