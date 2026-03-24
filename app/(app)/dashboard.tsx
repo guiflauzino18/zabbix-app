@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity,
   RefreshControl, ActivityIndicator,
@@ -13,8 +13,11 @@ import { ServerSelector } from '../../src/components/ServerSelector';
 import { SeverityCounter } from '../../src/components/ui/SeverityCounter';
 import type { ZabbixSeverity } from '../../src/api/zabbix.types';
 import { Checkbox } from 'expo-checkbox';
+import { router, useFocusEffect } from 'expo-router';
+import { ErrorState } from '@/components/ui/ErrorState';
 
-const SEVERITY_FILTERS: ZabbixSeverity[] = [5, 4, 3, 2, 1];
+let SEVERITY_FILTERS: ZabbixSeverity[] = [5, 4, 3, 2];
+const PROBLEM_CARD_HEIGHT = 86 //Quando os itens têm altura fixa, o FlatList pode calcular o layout sem medir cada item. Ótimo para desempenho
 
 export default function DashboardScreen() {
   const { currentUser, session, logoutAll } = useAuth();
@@ -22,17 +25,24 @@ export default function DashboardScreen() {
   const activeSessions = useActiveSessions();
   const [selectedServerId, setSelectedServerId] = useState<'all' | string>('all');
   const [showSuppressed, setShowSuppressed] = useState(false)
+  const [showInfo, setShowInfo] = useState(false)
   const [activeSeverity, setActiveSeverity] = useState<ZabbixSeverity | null>(null);
   const severityFilter = activeSeverity !== null ? [activeSeverity] : undefined;
-  const { problems, isLoading, isRefetching, refetch, countBySeverity, totalCount } = useProblems({ selectedServerId, severityFilter, showSuppressed });
+  const { problems, isLoading, isRefetching, refetch, countBySeverity, totalCount, error } = useProblems({ selectedServerId, severityFilter, showSuppressed });
   const activeServer = servers.find(s => s.id === session?.serverId);
+
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+  }, []),
+);
 
   const handleSeverityPress = useCallback((sev: ZabbixSeverity) => {
     setActiveSeverity(prev => (prev === sev ? null : sev));
   }, [])
 
 
-  // console.log("dashboard.tsx:35 "+currentUser?.username)
 
   const renderHeader = () => (
     <View className='m-2 bg-bg_primary rounded-sm'>
@@ -46,6 +56,7 @@ export default function DashboardScreen() {
               <Text className="text-green-400 text-xs">
                 {activeSessions.length} servidor{activeSessions.length !== 1 ? 'es' : ''} ativo{activeSessions.length !== 1 ? 's' : ''}
               </Text>
+              <Text onPress={() => router.push('/(auth)/login')} className='text-text_secondary text-xs ml-2'>+ Adicionar</Text>
             </View>
           </View>
 
@@ -102,7 +113,7 @@ export default function DashboardScreen() {
       {activeSeverity !== null && (
         <View className="flex-row items-center rounded-sm justify-between px-4 mb-2">
           <Text className="text-text_primary text-xs">Filtrando por severidade</Text>
-          <TouchableOpacity onPress={() => setActiveSeverity(null)}>
+          <TouchableOpacity onPress={() => {setActiveSeverity(null); setShowInfo(false)}}>
             <Text className="text-text_primary text-xs">Limpar filtro</Text>
           </TouchableOpacity>
         </View>
@@ -114,14 +125,23 @@ export default function DashboardScreen() {
           {problems.length} problema{problems.length !== 1 ? 's' : ''} encontrado{problems.length !== 1 ? 's' : ''}
         </Text>
         
-        <View className='flex-row gap-1'>
-          <Checkbox className='h-1' value={showSuppressed} onValueChange={(check) =>setShowSuppressed(check)}/>
-          <Text className='text-sm text-text_primary'>Exibir suprimidos</Text>
+        <View className='flex gap-2'>
+
+          <View className='flex-row gap-1 items-center'>
+            <Checkbox className='h-1' value={showSuppressed} onValueChange={(check) =>setShowSuppressed(check)}/>
+            <Text className='text-xs text-text_primary'>Exibir suprimidos</Text>
+          </View>
+
+          <View className='flex-row gap-1 items-center'>
+            <Checkbox  className='h-1' value={showInfo} onValueChange={(check) => {setShowInfo(check); setActiveSeverity(check ? 1 : null)}}/>
+            <Text className='text-xs text-text_primary'>Exibir Informações</Text>
+          </View>
         </View>
       </View>
     </View>
   );
 
+  
   const renderEmpty = () => {
     if (isLoading) return null;
     return (
@@ -139,17 +159,6 @@ export default function DashboardScreen() {
     );
   };
 
-  if (isLoading) {
-    return (
-      <SafeAreaView className="flex-1 bg-bg_secondary mx-2">
-        {renderHeader()}
-        <View className="flex-1 items-center justify-center">
-          <ActivityIndicator color="#E94560" size="large" />
-          <Text className="text-text_primary text-sm mt-3">Carregando incidentes...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView className="flex-1 bg-bg_secondary" edges={['top']}>
@@ -161,6 +170,15 @@ export default function DashboardScreen() {
             <ProblemCard problem={item} showServer={selectedServerId === 'all'} />
           </View>
         )}
+        getItemLayout={(_, index) => ({ // Evita o FlatList medir cada item individualmente
+          length: PROBLEM_CARD_HEIGHT,
+          offset: PROBLEM_CARD_HEIGHT * index,
+          index
+        })}
+        windowSize={10}   // Mantém mais itens renderizados para scroll mais suave
+        maxToRenderPerBatch={8}
+        initialNumToRender={12}
+        removeClippedSubviews={true}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
         refreshControl={

@@ -25,11 +25,7 @@ export function useAuth() {
   const session = currentEntry?.session ?? null;
   const currentUser = currentEntry?.user ?? null;
 
-  const login = async (
-    server: ZabbixServer,
-    username: string,
-    password: string,
-  ) => {
+  const login = async ( server: ZabbixServer, username: string, password: string, ) => {
     setIsLoggingIn(true);
     setLoginError(null);
 
@@ -48,6 +44,7 @@ export function useAuth() {
         result.user,
       );
 
+    
       router.replace('/(app)/dashboard');
 
     } catch (error: unknown) {

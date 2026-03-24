@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { SEVERITY_COLORS, type ZabbixSeverity } from '../api/zabbix.types';
 import type { ProblemWithServer } from '../services/problems.service';
 import { SeverityBadge } from './ui/SeverityBadges';
+import { memo } from 'react';
 
 interface Props {
   problem: ProblemWithServer;
@@ -17,59 +18,69 @@ function timeAgo(clock: string): string {
   return `há ${Math.floor(diff / 86400)}d`;
 }
 
-export function ProblemCard({ problem, showServer = true }: Props) {
-  const severity = parseInt(problem.severity) as ZabbixSeverity;
-  const severityColor = SEVERITY_COLORS[severity];
-  const isAcknowledged = problem.acknowledged === '1';
-  const hostName = problem.hostName ?? 'Host desconhecido';
 
-  return (
-    <TouchableOpacity
-      onPress={() =>
-        router.push({
-          pathname: '/problem/[id]',
-          params: { id: problem.eventid, serverId: problem.serverId },
-        })
-      }
-      className="rounded-xl p-3 mb-2 border bg-bg_primary"
-      style={{
-        // backgroundColor: '#16213E',
-        borderLeftWidth: 5,
-        borderLeftColor: severityColor,
-        borderWidth: .8,
-      }}
-    >
-      <View className="flex-row items-start gap-2">
-        <Text
-          className="flex-1 text-text_primary text-sm font-medium leading-snug"
-          numberOfLines={2}
-        >
-          {problem.name}
-        </Text>
-        <SeverityBadge severity={severity} size="sm" />
-      </View>
 
-      <View className="flex-row justify-between mt-1.5">
-        <Text className="text-text_primary text-xs" numberOfLines={1}>
-          {hostName}
-        </Text>
-        {showServer && (
-          <Text className="text-text_secondary text-xs">{problem.serverName}</Text>
-        )}
-      </View>
+export const ProblemCard = memo(
+  function ProblemCard({ problem, showServer = true }: Props) {
+    const severity = parseInt(problem.severity) as ZabbixSeverity;
+    const severityColor = SEVERITY_COLORS[severity];
+    const isAcknowledged = problem.acknowledged === '1';
+    const hostName = problem.hostName ?? 'Host desconhecido';
 
-      <View className="flex-row justify-between items-center mt-1">
-        {/* <View className="flex-row items-center gap-1">
-          <View
-            className="w-1.5 h-1.5 rounded-full"
-            style={{ backgroundColor: isAcknowledged ? '#4ade80' : '#6B7280' }}
-          />
-          <Text className="text-gray-500 text-xs">
-            {isAcknowledged ? 'Confirmado' : 'Não confirmado'}
+    return (
+      <TouchableOpacity
+        onPress={() =>
+          router.push({
+            pathname: '/problem/[id]',
+            params: { id: problem.eventid, serverId: problem.serverId },
+          })
+        }
+        className="rounded-xl p-3 mb-2 border bg-bg_primary"
+        style={{
+          // backgroundColor: '#16213E',
+          borderLeftWidth: 5,
+          borderLeftColor: severityColor,
+          borderWidth: .8,
+        }}
+      >
+        <View className="flex-row items-start gap-2">
+          <Text
+            className="flex-1 text-text_primary text-sm font-medium leading-snug"
+            numberOfLines={2}
+          >
+            {problem.name}
           </Text>
-        </View> */}
-        <Text className="text-text_primary text-xs">{timeAgo(problem.clock)}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-}
+          <SeverityBadge severity={severity} size="sm" />
+        </View>
+
+        <View className="flex-row justify-between mt-1.5">
+          <Text className="text-text_primary text-xs" numberOfLines={1}>
+            {hostName}
+          </Text>
+          {showServer && (
+            <Text className="text-text_secondary text-xs">{problem.serverName}</Text>
+          )}
+        </View>
+
+        <View className="flex-row justify-between items-center mt-1">
+          {/* <View className="flex-row items-center gap-1">
+            <View
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: isAcknowledged ? '#4ade80' : '#6B7280' }}
+            />
+            <Text className="text-gray-500 text-xs">
+              {isAcknowledged ? 'Confirmado' : 'Não confirmado'}
+            </Text>
+          </View> */}
+          <Text className="text-text_primary text-xs">{timeAgo(problem.clock)}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  },
+  (prev, next) =>    
+    prev.problem.eventid === next.problem.eventid &&
+    prev.problem.acknowledged === next.problem.acknowledged &&
+    prev.problem.suppressed === next.problem.suppressed &&
+    prev.showServer === next.showServer,
+  
+)

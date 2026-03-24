@@ -17,7 +17,7 @@ export function SeverityCounter({ severity, count, isActive, onPress }: Props) {
       onPress={onPress}
       style={{
         flex: 1,
-        backgroundColor: isActive ? color + '20' : '#16213E',
+        backgroundColor: isActive ? color + '20' : '#0A466A', 
         borderRadius: 10,
         padding: 10,
         alignItems: 'center',

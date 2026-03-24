@@ -29,7 +29,8 @@
     --color-success: #34AF67;
     --color-bg-primary: #2B2B2B;
     --color-bg-secondary: #0E1012;
-    --color-bg-tertiary: #454545;
+    /* --color-bg-tertiary: #454545; */
+    --color-bg-tertiary: #0A466A;
     --color-bg-dark: #0E0E0E;
     --color-text-primary: #DEDEDE;
     --color-text-secondary: #318FC6;

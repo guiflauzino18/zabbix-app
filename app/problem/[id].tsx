@@ -1,15 +1,15 @@
 import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator, Pressable, Modal, TextInput } from 'react-native';
-import { useLocalSearchParams, router, Label, Color, Icon } from 'expo-router';
+import { useLocalSearchParams, router, Label, Color, Icon, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServersStore } from '../../src/stores/servers.store';
 import { SEVERITY_COLORS, type ZabbixSeverity } from '../../src/api/zabbix.types';
 import { SeverityBadge } from '@/components/ui/SeverityBadges';
-import React, { Key, useState } from 'react';
+import React, { Key, useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/auth.store';
-import { acknowledgeProblems, fetchProblemsWithHosts, suppressProblems, SuppressProblemsOptions, unsuppressProblems } from '@/services/problems.service';
-import DateTimePicker from 'react-native-modal-datetime-picker';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { acknowledgeProblems, closeProblem, fetchProblemsWithHosts, suppressProblems, SuppressProblemsOptions, unsuppressProblems } from '@/services/problems.service';
+import ModalAcknowledge, { ModalKnowledgeProps } from '@/components/ModalAcknowledge';
+import { ErrorState } from '@/components/ui/ErrorState';
 
 
 function formatDate(clock: string) {
@@ -21,28 +21,18 @@ export default function ProblemDetailScreen() {
   const { session } = useAuthStore(s => s.getSession(serverId)!);
   const { servers } = useServersStore();
   const queryClient = useQueryClient();
-  const [datePickerVisible, setDatePickerVisible] = useState(false)
-  const [selectedDateSuppressed, setSelectedDateSuppressed] = useState<Date>()
-  const [suppressedMessage, setSuppressedMessage] = useState<string>()
-  const [modalSuppressed, setModalSuppressed] = useState(false)
-
-
+  const [modalAcknowledge, setModalAcknowledge] = useState<ModalKnowledgeProps>({type: 'suppressed', visible: false, onCancel: ()=> {}, onConfirm: ()=> {}})
   const server = servers.find(s => s.id === serverId);
 
   const { data: problem, isLoading, isError, error, refetch } = useQuery({
 
-    queryKey: ['problem-detail', id, serverId],
+    queryKey: ['problem-detail', id],
 
     queryFn: async () => {
-      const problem = await fetchProblemsWithHosts({
-        serverUrl: server!.url,
-        token: session.token,
-        id: [parseInt(id)]
-      });
-      
+      const problem = await fetchProblemsWithHosts({serverUrl: server!.url,token: session.token,id: [parseInt(id)]});
+
       return problem.at(0) ?? null
-      // const found = problem.find((p: { eventid: string; }) => p.eventid === id);
-      // return found ?? null;
+
     },
     enabled: !!server && !!session,
   });
@@ -52,8 +42,8 @@ export default function ProblemDetailScreen() {
 
       acknowledgeProblems(server!.url, session!.token.toString(), [id], message),
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['problem'] });
-        queryClient.invalidateQueries({ queryKey: ['problem-detail', id, serverId] });
+        queryClient.invalidateQueries({ queryKey: ['problems'] });
+        queryClient.invalidateQueries({ queryKey: ['problem-detail', id]});
         Alert.alert('Sucesso', 'Problema confirmado com sucesso.');
 
     },
@@ -62,13 +52,12 @@ export default function ProblemDetailScreen() {
     },
   });
 
-
   const suppressMutation = useMutation({mutationFn: (options: SuppressProblemsOptions) =>
 
       suppressProblems(options),
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['problem'] });
-        queryClient.invalidateQueries({ queryKey: ['problem-detail', id] });
+        queryClient.refetchQueries({ queryKey: ['problems'] });
+        queryClient.refetchQueries({ queryKey: ['problem-detail', id] });
         Alert.alert('Sucesso', 'Problema suprimido com sucesso.');
     },
     onError: (err) => {
@@ -80,8 +69,8 @@ export default function ProblemDetailScreen() {
 
       unsuppressProblems(options.eventids, options.serverUrl, options.token, options.message ?? ''),
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['problem'] });
-        queryClient.invalidateQueries({ queryKey: ['problem-detail', id] });
+        queryClient.refetchQueries({ queryKey: ['problems'] });
+        queryClient.refetchQueries({ queryKey: ['problem-detail', id] });
         Alert.alert('Sucesso', 'Problema exibido com sucesso.');
 
     },
@@ -90,31 +79,53 @@ export default function ProblemDetailScreen() {
     },
   });
 
-  const handleAcknowledge = () => {
+  const closeMutation = useMutation({mutationFn: (options: Omit<SuppressProblemsOptions, 'suppress_until'>) =>
 
+      closeProblem(options.eventids, options.serverUrl, options.token, options.message ?? ''),
+      onSuccess: () => {
+        queryClient.refetchQueries({ queryKey: ['problems'] });
+        queryClient.refetchQueries({ queryKey: ['problem-detail', id] });
+        Alert.alert('Sucesso', 'Problema encerrado com sucesso.');
+
+    },
+    onError: (err) => {
+      Alert.alert('Erro', 'Não foi possível confirmar o problema: '+err);
+    },
+  });
+
+
+
+  const handleAcknowledge = (message: string) => {
+
+    ackMutation.mutate(message)
     
-    Alert.alert("Confirmar", "Adicione uma mensagem", [
-        {text: 'Cancelar', style: 'cancel'},
-        {text: 'Confirmar',
-          onPress: (message = '') => ackMutation.mutate(message)
-        }
-      ]
-    )
+    // Alert.alert("Confirmar", "Adicione uma mensagem", [
+    //     {text: 'Cancelar', style: 'cancel'},
+    //     {text: 'Confirmar',
+    //       onPress: (message = '') => ackMutation.mutate(message)
+    //     }
+    //   ]
+    // )
   };
 
-  const handleSuppressed = () => {
-    setModalSuppressed(true)
-    
+  const handleSuppressed = (message: string, date: Date ) => {
+    const timeStampInSeconds = Math.floor(date.getTime() / 1000)
+    suppressMutation.mutate({serverUrl: server!.url, eventids: [parseInt(id)], message , suppress_until: timeStampInSeconds, token: session.token })
+
   };
 
-  
-  if (isError || ! problem){
-     return <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center'}}>
-        <Text>{error?.message}</Text>
-      </SafeAreaView>
-  }
+  const handleUnsuppressed = (message: string) => {
+    unsuppressMutation.mutate({eventids: [parseInt(id)], serverUrl: server?.url ?? '', token: session.token, message})
 
-  if (isLoading || !problem) {
+  };
+
+  const handleClose = (message: string) => {
+    closeMutation.mutate({eventids: [parseInt(id)], serverUrl: server?.url ?? '', token: session.token, message})
+
+  };
+
+
+  if (isLoading || !problem ) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#1A1A2E', alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator color="#E94560" />
@@ -122,10 +133,27 @@ export default function ProblemDetailScreen() {
     );
   }
 
+    if (error) {
+    return (
+      <SafeAreaView className="flex-1 bg-bg_primary">
+        <ErrorState
+          message="Erro ao carregar incidente"
+          onRetry={refetch}
+        />
+    </SafeAreaView>
+    )
+  }
+
   const severity = parseInt(problem.severity) as ZabbixSeverity;
   const severityColor = SEVERITY_COLORS[severity];
   const isAcknowledged = problem.acknowledged === '1';
-  const isSuppressed = problem.suppressed === '1';
+  let isSuppressed = problem.suppressed === '1';
+  let manualClose: boolean | undefined = undefined
+  if (problem.trigger != undefined) manualClose = problem.trigger.manual_close === '1'
+
+  function renderModal(props: ModalKnowledgeProps){
+    return <ModalAcknowledge  visible={props.visible} type={props.type} title={props.title} onConfirm={props.onConfirm} onCancel={props.onCancel}/>
+  }
 
   return (
     <SafeAreaView className='flex-1 bg-bg_secondary'>
@@ -205,7 +233,15 @@ export default function ProblemDetailScreen() {
           <View className='gap-4'>
             
             <Pressable
-                onPress={handleAcknowledge}
+                onPress={()=> setModalAcknowledge({
+                  type: 'acknowledge',
+                  visible: true,
+                  onCancel: ()=> setModalAcknowledge({...modalAcknowledge, visible: false}),
+                  onConfirm(message) {
+                    handleAcknowledge(message ?? '')
+                    setModalAcknowledge({...modalAcknowledge, visible: false})
+                  },
+                })}
                 disabled={ackMutation.isPending}
                 style={{
                   backgroundColor: ackMutation.isPending ? '#0F3460' : '#D40000',
@@ -221,27 +257,68 @@ export default function ProblemDetailScreen() {
             </Pressable>
 
             <Pressable
-                onPress={handleSuppressed}
-                disabled={ackMutation.isPending}
-                style={{
-                  backgroundColor: ackMutation.isPending ? '#0F3460' : '#7b817d',
-                  borderRadius: 12,
-                  padding: 16,
-                  alignItems: 'center',
-                }}
+            onPress={()=> setModalAcknowledge({
+              type: isSuppressed ? 'unsuppresed' : 'suppressed',
+              visible: true,
+              onCancel:()=> {setModalAcknowledge({...modalAcknowledge, visible: false})},
+              onConfirm: (message, date) => {
+                isSuppressed ? handleUnsuppressed(message ?? '') : handleSuppressed(message ?? '', date ?? new Date())
+                setModalAcknowledge({...modalAcknowledge, visible: false})
+              },
+            })}
+            disabled={suppressMutation.isPending || suppressMutation.isPending || isLoading}
+              style={{
+                backgroundColor: ackMutation.isPending ? '#0F3460' : '#7b817d',
+                borderRadius: 12,
+                padding: 16,
+                alignItems: 'center',
+              }}
               >
-              {ackMutation.isPending || suppressMutation.isPending || unsuppressMutation.isPending
+              {suppressMutation.isPending || suppressMutation.isPending || isLoading
               ? (<ActivityIndicator color="#fff" />)
-              : (<Text className='text-white text-lg font-bold'>{isSuppressed ? 'Exibir problema' : 'Suprimir problema'}</Text>)}
+              : (<Text className='text-white text-lg font-bold'>{isSuppressed ? 'Exibir Problema' : 'Suprimir Problema'}</Text>)}
 
             </Pressable>
+
           </View>
         )}
+
+
+        {manualClose && (
+          <Pressable
+          onPress={() => setModalAcknowledge({
+            visible: true,
+            type: 'close',
+            onCancel: ()=> {setModalAcknowledge({...modalAcknowledge, visible: false})},
+            onConfirm: (message)=>{
+              handleClose(message ?? '')
+              setModalAcknowledge({...modalAcknowledge, visible: false})
+            }
+          })}
+          disabled={suppressMutation.isPending || suppressMutation.isPending || isLoading}
+          style={{
+            backgroundColor: ackMutation.isPending ? '#0F3460' : '#318FC6',
+            borderRadius: 12,
+            padding: 16,
+            alignItems: 'center',
+          }}>
+            {suppressMutation.isPending || suppressMutation.isPending || isLoading
+            ? (<ActivityIndicator color="#fff" />)
+            : (<Text className='text-white text-lg font-bold'>Encerrar Incidente</Text>)}
+
+          </Pressable>
+        )}
+
       </ScrollView>
 
-      <Modal
+
+      <ModalAcknowledge visible={modalAcknowledge?.visible ?? false} type={modalAcknowledge?.type ?? 'suppressed'} onCancel={modalAcknowledge.onCancel} onConfirm={modalAcknowledge?.onConfirm} />
+
+
+      {/* <Modal
         animationType='slide'
         transparent={true}
+
         visible={modalSuppressed}>
 
           <View className='flex-1 items-center justify-center flex gap-5 p-5 bg-gray-900/80'>
@@ -270,6 +347,7 @@ export default function ProblemDetailScreen() {
                   </View>
                 )}
 
+
               <View className='flex-row justify-between'>
                 <Pressable
                   className='p-4 rounded-md bg-red'
@@ -282,15 +360,14 @@ export default function ProblemDetailScreen() {
                   onPress={()=> {
                     switch (isSuppressed) {
                       case false:
-                        const timeStampInSeconds = selectedDateSuppressed && Math.floor(selectedDateSuppressed?.getTime() / 1000)
-                        suppressMutation.mutate({serverUrl: server!.url, eventids: [parseInt(id)], message: suppressedMessage, suppress_until: timeStampInSeconds, token: session.token })
+                        handleSuppressed()
+                        setModalSuppressed(false)
                         break;
 
                       case true:
-                        unsuppressMutation.mutate({eventids: [parseInt(id)], serverUrl: server?.url ?? '', token: session.token, message: suppressedMessage})
+                        handleUnsuppressed()
                         break;
                     }
-                    setModalSuppressed(false)
                   }}>
                   <Text className='text-white'>Confirmar</Text>
                 </Pressable>
@@ -311,7 +388,7 @@ export default function ProblemDetailScreen() {
             </View>
         </View>
 
-      </Modal>
+      </Modal> */}
 
 
     </SafeAreaView>

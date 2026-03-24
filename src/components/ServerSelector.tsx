@@ -1,4 +1,4 @@
-import { ScrollView, TouchableOpacity, Text } from 'react-native';
+import { ScrollView, TouchableOpacity, Text, View } from 'react-native';
 import { useActiveSessions } from '../hooks/useActiveSessions';
 
 interface Props {
@@ -15,8 +15,9 @@ export function ServerSelector({ selected, onSelect }: Props) {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerClassName="gap-1.5 px-4 pb-1"
+      contentContainerClassName="gap-1.5 px-4 pb-1 items-center"
     >
+
       <Chip label="Todos" isActive={selected === 'all'} onPress={() => onSelect('all')} />
       {activeSessions.map(({ server }) => (
         <Chip
@@ -36,12 +37,12 @@ function Chip({ label, isActive, onPress }: { label: string; isActive: boolean; 
       onPress={onPress}
       className={`px-3.5 py-1.5 rounded-full border ${
         isActive
-          ? 'bg-text_secondary border-text_secondary'
-          : 'bg-bg_primary border-border'
+          ? 'bg-bg_tertiary border-white'
+          : 'bg-bg_primary border-border_color'
       }`}
     >
       <Text
-        className={`text-xs ${isActive ? 'text-white font-semibold' : 'text-primary'}`}
+        className={`text-xs ${isActive ? 'text-white font-semibold' : 'text-text_primary'}`}
       >
         {label}
       </Text>
