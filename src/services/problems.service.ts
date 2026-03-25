@@ -54,6 +54,7 @@ export async function fetchProblems(options: FetchProblemsOptions,): Promise<Zab
 
   if (id) {
     params.eventids = id
+    severities = [5,4,3,2,1] // se id != null busca todas as severidades, incluindo INFO
   }
 
   if (acknowledged != undefined){

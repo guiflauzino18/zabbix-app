@@ -124,16 +124,7 @@ export default function ProblemDetailScreen() {
 
   };
 
-
-  if (isLoading || !problem ) {
-    return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#1A1A2E', alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color="#E94560" />
-      </SafeAreaView>
-    );
-  }
-
-    if (error) {
+  if (error) {
     return (
       <SafeAreaView className="flex-1 bg-bg_primary">
         <ErrorState
@@ -143,6 +134,16 @@ export default function ProblemDetailScreen() {
     </SafeAreaView>
     )
   }
+
+  if (isLoading || !problem ) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#1A1A2E', alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator color="#E94560" />
+      </SafeAreaView>
+    );
+  }
+
+
 
   const severity = parseInt(problem.severity) as ZabbixSeverity;
   const severityColor = SEVERITY_COLORS[severity];
