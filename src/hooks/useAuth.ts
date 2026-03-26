@@ -32,6 +32,8 @@ export function useAuth() {
     try {
       const result = await loginToZabbix({serverUrl: server.url,username,password,});
 
+      console.log(result)
+
       updateServer(server.id, { apiVersion: result.apiVersion });
 
       await addSession(
@@ -47,10 +49,9 @@ export function useAuth() {
     
       router.replace('/(app)/dashboard');
 
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : 'Erro ao conectar ao servidor';
-      setLoginError(message);
+    } catch (e) {
+      setLoginError('Erro ao conectar ao servidor');
+      
     } finally {
       setIsLoggingIn(false);
     }
