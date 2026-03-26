@@ -26,7 +26,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Build Android
-        run: eas build --platform android --profile production --non-interactive
+        run: eas build --platform android --profile preview --non-interactive
 
       - name: Build iOS
-        run: eas build --platform ios --profile production --non-interactive
+        run: eas build --platform ios --profile preview --non-interactive
