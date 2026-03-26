@@ -74,14 +74,10 @@ export default function HostDetailScreen() {
   });
 
   // Busca apenas os problemas deste host para exibir na seção de alertas
-  const { problems: hostProblems } = useProblems({
-    selectedServerId: serverId,
-  });
+  const { problems: hostProblems } = useProblems({selectedServerId: serverId});
 
   // Filtra somente os problemas que pertencem a este host
-  const thisHostProblems = hostProblems.filter(
-    p => p.hostName === hostData?.name || p.hostName === hostData?.host,
-  );
+  const thisHostProblems = hostProblems.filter(p => p.hostName === hostData?.name || p.hostName === hostData?.host);
 
   // Encontra o item selecionado para o gráfico (ou usa o primeiro numérico)
   const numericItems = items.filter(i => ['0', '3'].includes(i.value_type));

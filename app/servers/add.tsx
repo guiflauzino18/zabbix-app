@@ -66,13 +66,8 @@ export default function AddServerScreen() {
     }
   };
 
-  const onSubmit = (data: ServerForm) => {
-    addServer({
-      name: data.name.toUpperCase(),
-      url: data.url.replace(/\/$/, ''),
-      isActive: true,
-      apiVersion: testResult?.version,
-    });
+  const onSubmit = (data: ServerForm) => { 
+    addServer({ name: data.name.toUpperCase(), url: data.url.replace(/\/$/, ''), isActive: true, apiVersion: testResult?.version, });
     router.back();
   };
 
