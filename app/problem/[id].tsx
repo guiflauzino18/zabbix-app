@@ -99,13 +99,6 @@ export default function ProblemDetailScreen() {
 
     ackMutation.mutate(message)
     
-    // Alert.alert("Confirmar", "Adicione uma mensagem", [
-    //     {text: 'Cancelar', style: 'cancel'},
-    //     {text: 'Confirmar',
-    //       onPress: (message = '') => ackMutation.mutate(message)
-    //     }
-    //   ]
-    // )
   };
 
   const handleSuppressed = (message: string, date: Date ) => {

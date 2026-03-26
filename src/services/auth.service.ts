@@ -33,23 +33,9 @@ export async function loginToZabbix(credentials: LoginCredentials,): Promise<Log
   ? { username, password }
   : { user: username, password };
   
-  const user = await zabbixRequest<ZabbixUser>(
-    serverUrl,
-    'user.login',
-    { ...loginParams, userData: true }
+  const user = await zabbixRequest<ZabbixUser>( serverUrl, 'user.login', { ...loginParams, userData: true }
   );
-  
 
-  // // 3. Busca dados do usuário autenticado
-  // const users = await zabbixRequest<ZabbixUser[]>(
-  //   serverUrl,
-  //   'user.get',
-  //   {
-  //     output: ['userid', 'username', 'name', 'surname', 'type'],
-
-  //   },
-  //   user.sessionid
-  // );
 
   return {
     token: user.sessionid,
