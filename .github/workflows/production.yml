@@ -1,9 +1,9 @@
 name: Build production
 
 on:
-  push:
-    branches: [main]
-    tags: ['v*']
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
