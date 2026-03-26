@@ -59,20 +59,15 @@ export default function AddServerScreen() {
     } catch {
       setTestResult({
         ok: false,
-        message: 'Não foi possível conectar. Verifique a URL e a rede.',
+        message: 'Não foi possível conectar. Verifique a URL e/ou tente adicionar /zabbix no final.',
       });
     } finally {
       setIsTesting(false);
     }
   };
 
-  const onSubmit = (data: ServerForm) => {
-    addServer({
-      name: data.name.toUpperCase(),
-      url: data.url.replace(/\/$/, ''),
-      isActive: true,
-      apiVersion: testResult?.version,
-    });
+  const onSubmit = (data: ServerForm) => { 
+    addServer({ name: data.name.toUpperCase(), url: data.url.replace(/\/$/, ''), isActive: true, apiVersion: testResult?.version, });
     router.back();
   };
 
