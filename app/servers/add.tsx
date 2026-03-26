@@ -59,7 +59,7 @@ export default function AddServerScreen() {
     } catch {
       setTestResult({
         ok: false,
-        message: 'Não foi possível conectar. Verifique a URL e a rede.',
+        message: 'Não foi possível conectar. Verifique a URL e/ou tente adicionar /zabbix no final.',
       });
     } finally {
       setIsTesting(false);
