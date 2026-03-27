@@ -65,6 +65,14 @@
           "enableFileSharing": true
         }
       ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
       "expo-sharing"
     ],
     "extra": {
