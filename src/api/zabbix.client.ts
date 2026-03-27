@@ -12,6 +12,7 @@ export function getZabbixClient(serverUrl: string): AxiosInstance {
     baseURL: `${serverUrl.replace(/\/$/, '')}/api_jsonrpc.php`,
     headers: { 'Content-Type': 'application/json-rpc' },
     timeout: 15000,
+    httpsAgent: undefined,  // Necessário para servidores com certificado self-signed ou autoridades certificadoras privadas
   });
 
   clients.set(serverUrl, client);
