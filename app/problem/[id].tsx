@@ -3,13 +3,14 @@ import { useLocalSearchParams, router, Label, Color, Icon, useFocusEffect } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useServersStore } from '../../src/stores/servers.store';
-import { SEVERITY_COLORS, type ZabbixSeverity } from '../../src/api/zabbix.types';
+import { SEVERITY_COLORS, TriggerItem, type ZabbixSeverity } from '../../src/api/zabbix.types';
 import { SeverityBadge } from '@/components/ui/SeverityBadges';
 import React, { Key, useCallback, useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/auth.store';
 import { acknowledgeProblems, closeProblem, fetchProblemsWithHosts, suppressProblems, SuppressProblemsOptions, unsuppressProblems } from '@/services/problems.service';
 import ModalAcknowledge, { ModalKnowledgeProps } from '@/components/ModalAcknowledge';
 import { ErrorState } from '@/components/ui/ErrorState';
+import { fetchTriggerItems } from '@/services/trigger.service';
 
 
 function formatDate(clock: string) {
@@ -36,6 +37,18 @@ export default function ProblemDetailScreen() {
     },
     enabled: !!server && !!session,
   });
+
+// Busca os itens do trigger associado ao problema
+const { data: triggerItems } = useQuery({
+  queryKey: ['trigger-items', problem?.objectid, serverId],
+  queryFn: async () => {
+    if (!problem?.objectid) return [];
+    const itemsMap = await fetchTriggerItems(server!.url, session.token, [problem.objectid]);
+    return itemsMap[problem.objectid] ?? [];
+  },
+  enabled: !!problem?.objectid && !!server && !!session,
+  staleTime: 30_000,
+});
 
 
   const ackMutation = useMutation({mutationFn: (message: string) =>
@@ -201,6 +214,59 @@ export default function ProblemDetailScreen() {
           <InfoRow label="Event ID" value={problem.eventid} mono />
         </View>
 
+        {/* Dados operacionais — últimos valores dos itens do trigger */}
+        {triggerItems && triggerItems.length > 0 && (
+          <View>
+            <Text className="text-text_primary text-xs font-medium mb-1.5 ml-1">
+              DADOS OPERACIONAIS
+            </Text>
+            <View
+              className="rounded-xl overflow-hidden bg-bg_primary"
+                style={{borderWidth: 0.3}}
+            >
+              {triggerItems.map((item, index) => {
+                const isLast = index === triggerItems.length - 1;
+                const formattedValue = formatItemValue(item);
+
+                // Determina a cor do valor baseado na severidade do problema
+                // Itens numéricos ficam na cor da severidade para chamar atenção
+                const valueColor = ['0', '3'].includes(item.value_type)
+                  ? SEVERITY_COLORS[severity]
+                  : '#9CA3AF';
+
+                return (
+                  <View
+                    key={item.itemid}
+                    className="px-4 py-3 flex-row items-center"
+                    style={{ borderBottomWidth: isLast ? 0 : 0.5,borderBottomColor: '#0F3460',
+                    }}
+                  >
+                    <View className="flex-1">
+                      <Text
+                        className="text-text_primary text-sm"
+                        numberOfLines={2}
+                      >
+                        {item.name}
+                      </Text>
+                      {item.lastclock && parseInt(item.lastclock) > 0 && (
+                        <Text className="text-text_primary text-xs mt-0.5">
+                          Atualizado {lastSeenAgo(item.lastclock)}
+                        </Text>
+                      )}
+                    </View>
+                    <Text
+                      className="text-sm font-semibold ml-3"
+                      style={{ color: valueColor }}
+                    >
+                      {formattedValue}
+                    </Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
         {/* Histórico de acknowledges */}
         {problem.acknowledges && problem.acknowledges.length > 0 && (
           <View className='bg-bg_primary rounded-xl p-2' style={{borderWidth: 0.3}}>
@@ -308,83 +374,6 @@ export default function ProblemDetailScreen() {
 
       <ModalAcknowledge visible={modalAcknowledge?.visible ?? false} type={modalAcknowledge?.type ?? 'suppressed'} onCancel={modalAcknowledge.onCancel} onConfirm={modalAcknowledge?.onConfirm} />
 
-
-      {/* <Modal
-        animationType='slide'
-        transparent={true}
-
-        visible={modalSuppressed}>
-
-          <View className='flex-1 items-center justify-center flex gap-5 p-5 bg-gray-900/80'>
-
-            <View className='flex justify-between bg-bg_primary gap-2 p-5 rounded-lg min-h-[350px] h-[50%] w-[90%]'>
-
-              <View>
-                <Text className='font-bold text-text_primary text-xl text-center'>Reconhecer Problema</Text>
-              </View>
-
-              <View className='gap-2'>
-                <TextInput onChangeText={(t) => setSuppressedMessage(t)} className='border border-border_color rounded-md py-6 text-wrap text-sm text-text_primary placeholder:text-text_primary' placeholder='Digite uma mensagem...(Opcional)'></TextInput>
-              </View>
-
-               { !isSuppressed && (
-                  <View className='flex-1 mt-5'>
-                    <Text className='text-text_primary text-sm'>Suprimir evento até esta data ou deixe em branco para "indeterminado"</Text>
-
-                    <Pressable
-                      className='border border-border_color mt-1 p-2 rounded-md flex-row justify-between'
-                      onPress={()=> setDatePickerVisible(true)}>
-
-                      <Text className='text-text_primary'>{selectedDateSuppressed?.toISOString ? selectedDateSuppressed.toLocaleDateString() : 'selecione a data'}</Text>
-                      <FontAwesome name="calendar" size={16} color="gray"/>
-                    </Pressable>
-                  </View>
-                )}
-
-
-              <View className='flex-row justify-between'>
-                <Pressable
-                  className='p-4 rounded-md bg-red'
-                  onPress={()=> setModalSuppressed(false)}>
-                  <Text className='text-white'>Cancelar</Text>
-                </Pressable>
-
-                <Pressable
-                  className='p-4 rounded-md bg-text_secondary'
-                  onPress={()=> {
-                    switch (isSuppressed) {
-                      case false:
-                        handleSuppressed()
-                        setModalSuppressed(false)
-                        break;
-
-                      case true:
-                        handleUnsuppressed()
-                        break;
-                    }
-                  }}>
-                  <Text className='text-white'>Confirmar</Text>
-                </Pressable>
-              </View>  
-
-              <DateTimePicker
-                isVisible={datePickerVisible}
-                mode='date'
-                onConfirm={(date)=>{
-                    setSelectedDateSuppressed(date)
-                    setDatePickerVisible(false)
-                  }
-                }
-                onCancel={()=>{
-                  setDatePickerVisible(false)
-                }}
-              />
-            </View>
-        </View>
-
-      </Modal> */}
-
-
     </SafeAreaView>
   );
 }
@@ -396,4 +385,32 @@ function InfoRow({ label, value, mono = false }: { label: string; value: string;
       <Text className='text-text_primary text-md max-w-[70%] flex-wrap'>{value}</Text>
     </View>
   );
+}
+
+
+// Formata o valor do item com sua unidade de forma legível
+function formatItemValue(item: TriggerItem): string {
+  const val = parseFloat(item.lastvalue);
+  if (isNaN(val)) return item.lastvalue || '—';
+
+  if (item.units === 'B' || item.units === 'bytes') {
+    if (val >= 1073741824) return `${(val / 1073741824).toFixed(1)} GB`;
+    if (val >= 1048576) return `${(val / 1048576).toFixed(1)} MB`;
+    if (val >= 1024) return `${(val / 1024).toFixed(1)} KB`;
+    return `${val} B`;
+  }
+  if (item.units === 'bps') {
+    if (val >= 1000000) return `${(val / 1000000).toFixed(1)} Mbps`;
+    if (val >= 1000) return `${(val / 1000).toFixed(1)} Kbps`;
+    return `${val} bps`;
+  }
+  if (item.units === '%') return `${val.toFixed(1)}%`;
+  return `${val.toFixed(val % 1 === 0 ? 0 : 2)}${item.units ? ' ' + item.units : ''}`;
+}
+
+function lastSeenAgo(clock: string): string {
+  const diff = Math.floor(Date.now() / 1000) - parseInt(clock);
+  if (diff < 60) return `há ${diff}s`;
+  if (diff < 3600) return `há ${Math.floor(diff / 60)}min`;
+  return `há ${Math.floor(diff / 3600)}h`;
 }

@@ -73,6 +73,15 @@ export interface ZabbixTrigger {
   hosts: Array<{ hostid: string; name: string; status: number }>;
 }
 
+export interface TriggerItem {
+  itemid: string;
+  name: string;
+  lastvalue: string;
+  lastclock: string;
+  units: string;
+  value_type: string;
+}
+
 export type ZabbixSeverity = 0 | 1 | 2 | 3 | 4 | 5;
 
 export const SEVERITY_LABELS: Record<ZabbixSeverity, string> = {
