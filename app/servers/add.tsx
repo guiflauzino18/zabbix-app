@@ -100,7 +100,7 @@ export default function AddServerScreen() {
               name="name"
               render={({ field: { onChange, value, onBlur } }) => (
                 <TextInput
-                  className="bg-zabbix-surface border rounded-xl px-4 py-3.5 text-primary text-base"
+                  className="border rounded-xl px-4 py-3.5 text-text_primary text-base"
                   placeholder="Ex: Produção"
                   placeholderTextColor="#5d6776"
                   onChangeText={onChange}
