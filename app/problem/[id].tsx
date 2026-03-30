@@ -393,7 +393,8 @@ function formatItemValue(item: TriggerItem): string {
   const val = parseFloat(item.lastvalue);
   if (isNaN(val)) return item.lastvalue || '—';
 
-  if (item.units === 'B' || item.units === 'bytes') {
+  if (item.units === 'B'  || item.units === 'b' || item.units === 'bytes') {
+    if (val >= 1099511627776) return `${(val / 1099511627776).toFixed(1)} TB`;
     if (val >= 1073741824) return `${(val / 1073741824).toFixed(1)} GB`;
     if (val >= 1048576) return `${(val / 1048576).toFixed(1)} MB`;
     if (val >= 1024) return `${(val / 1024).toFixed(1)} KB`;
