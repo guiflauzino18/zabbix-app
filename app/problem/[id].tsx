@@ -38,17 +38,17 @@ export default function ProblemDetailScreen() {
     enabled: !!server && !!session,
   });
 
-// Busca os itens do trigger associado ao problema
-const { data: triggerItems } = useQuery({
-  queryKey: ['trigger-items', problem?.objectid, serverId],
-  queryFn: async () => {
-    if (!problem?.objectid) return [];
-    const itemsMap = await fetchTriggerItems(server!.url, session.token, [problem.objectid]);
-    return itemsMap[problem.objectid] ?? [];
-  },
-  enabled: !!problem?.objectid && !!server && !!session,
-  staleTime: 30_000,
-});
+  // Busca os itens do trigger associado ao problema
+  const { data: triggerItems } = useQuery({
+    queryKey: ['trigger-items', problem?.objectid, serverId],
+    queryFn: async () => {
+      if (!problem?.objectid) return [];
+      const itemsMap = await fetchTriggerItems(server!.url, session.token, [problem.objectid]);
+      return itemsMap[problem.objectid] ?? [];
+    },
+    enabled: !!problem?.objectid && !!server && !!session,
+    staleTime: 30_000,
+  });
 
 
   const ackMutation = useMutation({mutationFn: (message: string) =>
@@ -99,14 +99,13 @@ const { data: triggerItems } = useQuery({
         queryClient.refetchQueries({ queryKey: ['problems'] });
         queryClient.refetchQueries({ queryKey: ['problem-detail', id] });
         Alert.alert('Sucesso', 'Problema encerrado com sucesso.');
+        router.back()
 
     },
     onError: (err) => {
       Alert.alert('Erro', 'Não foi possível confirmar o problema: '+err);
     },
   });
-
-
 
   const handleAcknowledge = (message: string) => {
 
@@ -143,12 +142,11 @@ const { data: triggerItems } = useQuery({
 
   if (isLoading || !problem ) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#1A1A2E', alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color="#E94560" />
+      <SafeAreaView className='flex-1 bg-bg_primary alignitems-center justify-center'>
+        <ActivityIndicator color="#E94560" size={'large'}/>
       </SafeAreaView>
     );
   }
-
 
 
   const severity = parseInt(problem.severity) as ZabbixSeverity;

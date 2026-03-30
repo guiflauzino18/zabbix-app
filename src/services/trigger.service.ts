@@ -28,7 +28,9 @@ export async function fetchTriggerItems(serverUrl: string, token: string, trigge
   if (triggerids.length === 0) return {};
 
   // Busca os triggers com seus itens associados
-  const triggers = await zabbixRequest<Array<{triggerid: string; items: TriggerItem[];}>>(serverUrl, 'trigger.get', {
+  const triggers = await zabbixRequest<Array<{triggerid: string; items: TriggerItem[];}>>(
+      serverUrl,
+      'trigger.get', {
       triggerids,
       output: ['triggerid'],
       // Inclui os itens do trigger com últimos valores
@@ -36,6 +38,8 @@ export async function fetchTriggerItems(serverUrl: string, token: string, trigge
     },
     token,
   );
+
+  console.log(triggers)
 
   // Monta mapa triggerid -> itens para acesso rápido
   return triggers.reduce<Record<string, TriggerItem[]>>((acc, t) => {

@@ -43,7 +43,6 @@ export default function DashboardScreen() {
   }, [])
 
 
-
   const renderHeader = () => (
     <View className='m-2 bg-bg_primary rounded-sm'>
       {/* Header */}
@@ -141,7 +140,7 @@ export default function DashboardScreen() {
     </View>
   );
 
-  
+
   const renderEmpty = () => {
     if (isLoading) return null;
     return (
